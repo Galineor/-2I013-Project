@@ -1,17 +1,21 @@
 package Environnement;
 
+import java.util.ArrayList;
 import Agent.Agent;
 
 public class Map extends World {
 	
 	int terrain [][][];
 	protected int water [][];
+	private ArrayList<Agent> toAdd;
 	
 	
 	public Map(int dx, int dy) {
 		super (dx , dy);
 		terrain = new int [dx][dy][3];
 		water = new int[dx][dy];
+
+		toAdd = new ArrayList<Agent>();
 		
 		//for (int  x = 0; x < dx; x++){
 		//	for(int y = 0; y < dy; y++){
@@ -42,6 +46,10 @@ public class Map extends World {
 			}
 		}
 	}
+
+	public ArrayList<Agent> getToAdd(){
+		return this.toAdd;
+	}
 	
 	//creer un deuxieme constructeur qui prends un nuage de point pour creer la map
 	
@@ -56,6 +64,9 @@ public class Map extends World {
 			if (a.isAlive())
 				a.Step();
 		}
+
+		agents.addAll(toAdd);
+		toAdd = new ArrayList<Agent>();
 	}
 	
 	public void StepWorld(){

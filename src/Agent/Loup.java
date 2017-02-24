@@ -43,7 +43,7 @@ public class Loup extends Pred {
 				return;
 			}
 		}	
-		world.getAgents().add(new Loup(world, this.posX, this.posY));
+		world.getToAdd().add(new Loup(world, this.posX, this.posY));
 	}
 	
 	@Override
