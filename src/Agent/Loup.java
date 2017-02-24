@@ -1,6 +1,6 @@
 package Agent;
 
-import Environnement.World;
+import Environnement.*;
 
 public class Loup extends Pred {
 
@@ -43,7 +43,7 @@ public class Loup extends Pred {
 				return;
 			}
 		}	
-		world.getToAdd().add(new Loup(world, this.posX, this.posY));
+		((Map)world).getToAdd().add(new Loup(world, this.posX, this.posY));
 	}
 	
 	@Override
@@ -82,6 +82,10 @@ public class Loup extends Pred {
          		posX = ( posX - 1 + world.getWidth() ) % world.getWidth();
  				break;
 		 }
+		 
+		 if(manger()){
+				ht = hungerTime;
+			}
 		 
 		 ht--;
 		 rt--;
