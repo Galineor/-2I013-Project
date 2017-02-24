@@ -11,7 +11,6 @@ public abstract class World {
 	public World(int sizeX, int sizeY){
 		this.sizeX = sizeX;
 		this.sizeY = sizeY;
-		
 		agents = new ArrayList<Agent>();
 	}
 	

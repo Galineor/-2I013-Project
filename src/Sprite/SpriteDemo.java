@@ -27,9 +27,9 @@ public class SpriteDemo extends JPanel {
 	private Image moutonSprite;
 	
 	private int spriteLength = 16;
-	private static int delai = 100;
+	private static int delai = 500;
 	
-	private int tailleX = 50, tailleY = 50;
+	private int tailleX =50, tailleY = 50;
 	private Map myMap;
 
 	public SpriteDemo()
@@ -56,27 +56,26 @@ public class SpriteDemo extends JPanel {
 		
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< 1; i++){
+		for(int i=0; i< 20; i++){
 			myMap.getAgents().add(new Loup(myMap));
 			myMap.getAgents().add(new Mouton(myMap));
 		}
 	}
 
-	public void paint(Graphics g)
-	{
+	public void paint(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
 		for ( int i = 0 ; i < myMap.getTerrain().length ; i++ )
-			for ( int j = 0 ; j < myMap.getTerrain()[0].length ; j++ )
-			{
-				if ( myMap.getTerrain()[i][j][0] == 0)
+			for ( int j = 0 ; j < myMap.getTerrain()[0].length ; j++ ){
+				
+				if ( myMap.getTerrain()[i][j][0] == 0){
 					//Affiche une plaine
-					g2.drawImage(grassSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-				else if(myMap.getTerrain()[i][j][0] == 1){
-					g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-				}else if(myMap.getTerrain()[i][j][0] == 2){
+					if (myMap.getWater()[i][j] > 0)
+						g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					else
+						g2.drawImage(grassSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+				}else if(myMap.getTerrain()[i][j][0] == 1){
 					g2.drawImage(desertSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 				}
-				
 			}
 		
 		

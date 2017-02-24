@@ -5,7 +5,7 @@ import Environnement.World;
 public class Loup extends Pred {
 
 	public Loup(World world) {
-		super(world, 300, 350);
+		super(world, 100, 150);
 		this.posX = (int)(Math.random()*world.getWidth());
 		this.posY = (int)(Math.random()*world.getHeight());
 		this.direction = (int)(Math.random()*4);
@@ -14,7 +14,7 @@ public class Loup extends Pred {
 	}
 	
 	public Loup(World world, int x, int y) {
-		super(world, 300, 350);
+		super(world, 100, 150);
 		this.posX = x;
 		this.posY = y;
 		this.direction = (int)(Math.random()*4);
@@ -42,10 +42,10 @@ public class Loup extends Pred {
 				((Pred)a).setHt(hungerTime);
 				return;
 			}
-		}
-		
+		}	
 		world.getAgents().add(new Loup(world, this.posX, this.posY));
 	}
+	
 	@Override
 	public void Step() {
 		if(manger()){
@@ -66,7 +66,7 @@ public class Loup extends Pred {
 			direction = (direction-1+4) %4;
 
 		
-		// met a jour: la position de l'agent (dpend de l'orientation)
+		// met a jour: la position de l'agent (depend de l'orientation)
 		 switch ( direction ) 
 		 {
          	case 0: // nord	
