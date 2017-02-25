@@ -53,7 +53,7 @@ public class SpriteDemo extends JPanel {
 
 		frame = new JFrame("World of Sprite");
 		frame.add(this);
-		frame.setSize(tailleX*spriteLength, tailleY*spriteLength+40);
+		frame.setSize(tailleX*spriteLength+16, tailleY*spriteLength+40);
 		frame.setVisible(true);
 		
 		

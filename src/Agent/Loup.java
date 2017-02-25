@@ -48,41 +48,69 @@ public class Loup extends Pred {
 	
 	@Override
 	public void Step() {
+		//On mange avant de se deplacer
 		if(manger()){
 			ht = hungerTime;
 		}
+		
+		//Si le loup a trop faim, il meurt
 		if(ht == 0){
 			this.setAlive(false);
 		}
 		
+		//Le loup se reproduit apres reprodTime iterations
 		if(rt == 0){
 			reproduire();
 			rt = reprodTime;
 		}
-		// TODO Auto-generated method stub
+		
+		//Le loup se deplace au hasard
 		if ( Math.random() > 0.5 ) // au hasard
 			direction = (direction+1) %4;
 		else
 			direction = (direction-1+4) %4;
-
+		
+		
+		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
+		if(isObstacleDirection(direction)){
+			if ( Math.random() > 0.5 ){ // au hasard
+				for(int i=0; i<3; i++){
+					direction = (direction+1) %4;
+					if(!isObstacleDirection(direction)){
+						break;
+					}
+				}
+			}
+			else{
+				for(int i=0; i<3; i++){
+					direction = (direction-1+4) %4;
+					if(!isObstacleDirection(direction)){
+						break;
+					}
+				}
+			}	
+		}
 		
 		// met a jour: la position de l'agent (depend de l'orientation)
-		 switch ( direction ) 
-		 {
-         	case 0: // nord	
-         		posY = ( posY - 1 + world.getHeight() ) % world.getHeight();
-         		break;
-         	case 1:	// est
-         		posX = ( posX + 1 + world.getWidth() ) % world.getWidth();
- 				break;
-         	case 2:	// sud
-         		posY = ( posY + 1 + world.getHeight() ) % world.getHeight();
- 				break;
-         	case 3:	// ouest
-         		posX = ( posX - 1 + world.getWidth() ) % world.getWidth();
- 				break;
-		 }
-		 
+		if(!isObstacleDirection(direction)){
+			 switch ( direction ) 
+			 {
+	         	case 0: // nord
+	         		posY = ( posY - 1 + world.getHeight() ) % world.getHeight();
+	         		break;
+	         	case 1:	// est
+	         		posX = ( posX + 1 + world.getWidth() ) % world.getWidth();
+	 				break;
+	         	case 2:	// sud
+	         		posY = ( posY + 1 + world.getHeight() ) % world.getHeight();
+	 				break;
+	         	case 3:	// ouest
+	         		posX = ( posX - 1 + world.getWidth() ) % world.getWidth();
+	 				break;
+			 }
+		}
+		
+		
 		 if(manger()){
 				ht = hungerTime;
 			}

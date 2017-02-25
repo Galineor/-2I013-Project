@@ -1,5 +1,6 @@
 package Agent;
 
+import Environnement.Map;
 import Environnement.World;
 
 public class Mouton extends Prey {
@@ -21,21 +22,43 @@ public class Mouton extends Prey {
 			direction = (direction-1+4) %4;
 
 		
-		// met a jour: la position de l'agent (dpend de l'orientation)
-		 switch ( direction ) 
-		 {
-         	case 0: // nord	
-         		posY = ( posY - 1 + world.getHeight() ) % world.getHeight();
-         		break;
-         	case 1:	// est
-         		posX = ( posX + 1 + world.getWidth() ) % world.getWidth();
- 				break;
-         	case 2:	// sud
-         		posY = ( posY + 1 + world.getHeight() ) % world.getHeight();
- 				break;
-         	case 3:	// ouest
-         		posX = ( posX - 1 + world.getWidth() ) % world.getWidth();
- 				break;
-		 }
+		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
+		if(isObstacleDirection(direction)){
+			if ( Math.random() > 0.5 ){ // au hasard
+				for(int i=0; i<3; i++){
+					direction = (direction+1) %4;
+					if(!isObstacleDirection(direction)){
+						break;
+					}
+				}
+			}
+			else{
+				for(int i=0; i<3; i++){
+					direction = (direction-1+4) %4;
+					if(!isObstacleDirection(direction)){
+						break;
+					}
+				}
+			}	
+		}
+		
+		// met a jour: la position de l'agent (depend de l'orientation)
+		if(!isObstacleDirection(direction)){
+			 switch ( direction ) 
+			 {
+	         	case 0: // nord
+	         		posY = ( posY - 1 + world.getHeight() ) % world.getHeight();
+	         		break;
+	         	case 1:	// est
+	         		posX = ( posX + 1 + world.getWidth() ) % world.getWidth();
+	 				break;
+	         	case 2:	// sud
+	         		posY = ( posY + 1 + world.getHeight() ) % world.getHeight();
+	 				break;
+	         	case 3:	// ouest
+	         		posX = ( posX - 1 + world.getWidth() ) % world.getWidth();
+	 				break;
+			 }
+		}
 	}
 }

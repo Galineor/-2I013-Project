@@ -72,6 +72,35 @@ public abstract class Agent {
 	public void setDirection(int direction) {
 		this.direction = direction;
 	}
+	
+	
+	public boolean isObstacleDirection(int d){
+		switch(d){
+		case 0:
+			if(((Map)world).getTerrain()[posX][(posY - 1 + world.getHeight()) % world.getHeight()][2] == 0){
+				return false;
+			}
+			break;
+		case 1:
+			if(((Map)world).getTerrain()[ (posX + 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
+				return false;
+			}
+			break;
+		case 2:
+			if(((Map)world).getTerrain()[posX][(posY + 1 + world.getHeight()) % world.getHeight()][2] == 0){
+				return false;
+			}
+			break;
+		case 3:
+			if(((Map)world).getTerrain()[(posX - 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
+				return false;
+			}
+			break;
+		}
+		
+		return true;
+	}
+
 
 
 }

@@ -6,6 +6,10 @@ import Agent.Agent;
 public class Map extends World {
 	
 	int terrain [][][];
+	/*terrain[x][y][0] : 
+	 * */
+	
+	
 	protected int water [][];
 	private ArrayList<Agent> toAdd;
 	
@@ -79,15 +83,19 @@ public class Map extends World {
 				if (terrain[x][y][0] == 1)
 					continue;
 				if(water[(x - 1 + water.length) % water.length][y] > water[x][y]+1){
+					terrain[x][y][2] = 1;
 					water[x][y] ++;
 					water[(x - 1 + water.length) % water.length][y] --;
 				}else if(water[(x + 1) % water.length][y] > water[x][y]+1){
+					terrain[x][y][2] = 1;
 					water[x][y] ++;
 					water[(x + 1) % water.length][y] --;
 				}else if(water[x][(y - 1 + water.length) % water.length] > water[x][y]+1){
+					terrain[x][y][2] = 1;
 					water[x][y] ++;
 					water[x][(y - 1 + water.length) % water.length] --;
 				}else if(water[x][(y - 1 + water.length) % water.length] > water[x][y]+1){
+					terrain[x][y][2] = 1;
 					water[x][y] ++;
 					water[x][(y - 1 + water.length) % water.length] --;
 				}
