@@ -28,6 +28,8 @@ public class Map extends World {
 			for (int y = 0; y < terrain.length; y++) {
 				if (x > terrain.length/2 && y > terrain.length/2)
 					terrain[x][y][0] = 1; //definie le type de terrain
+				else if (x > terrain.length/2 - 2 && y > terrain.length/2 - 2)
+					terrain[x][y][0] = (int) (Math.random() * 2);
 				else
 					terrain[x][y][0] = 0;
 				
@@ -41,8 +43,10 @@ public class Map extends World {
 				if (Math.random() > 0.90){
 					water[x][y] = (int)(Math.random() * 5) + 1; //cree de l'eau d'une profondeur aleatoire 
 					terrain[x][y][2] = 1; //met de l'eau dans le terrain (condidere comme un obstacle
-				}else
-					terrain[x][y][2] = 0; //definie les obstacles du terrain
+				}else if(Math.random() > 0.80)
+					terrain[x][y][2] = 2; //definie les obstacles du terrain
+				else
+					terrain[x][y][2] = 0;
 			}
 		}
 	}

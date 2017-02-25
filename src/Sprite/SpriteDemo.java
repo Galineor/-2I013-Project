@@ -23,6 +23,7 @@ public class SpriteDemo extends JPanel {
 	private Image grassSprite;
 	private Image desertSprite;
 	private Image treeSprite;
+	private Image rockSprite;
 	private Image loupSprite;
 	private Image moutonSprite;
 	
@@ -38,6 +39,7 @@ public class SpriteDemo extends JPanel {
 		{
 			waterSprite = ImageIO.read(new File("src/water.png"));
 			treeSprite = ImageIO.read(new File("src/tree.png"));
+			rockSprite = ImageIO.read(new File("src/rock.png"));
 			grassSprite = ImageIO.read(new File("src/grass.png"));
 			desertSprite = ImageIO.read(new File("src/desert.png"));
 			loupSprite = ImageIO.read(new File("src/wolf.png"));
@@ -76,6 +78,12 @@ public class SpriteDemo extends JPanel {
 				}else if(myMap.getTerrain()[i][j][0] == 1){
 					g2.drawImage(desertSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 				}
+				
+				if (myMap.getTerrain()[i][j][2] == 2)
+					if (myMap.getTerrain()[i][j][0] == 0)
+						g2.drawImage(treeSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					else
+						g2.drawImage(rockSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 			}
 		
 		
