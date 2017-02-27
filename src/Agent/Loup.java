@@ -46,6 +46,27 @@ public class Loup extends Pred {
 		((Map)world).getToAdd().add(new Loup(world, this.posX, this.posY));
 	}
 	
+	public int chasser(){
+		
+		for (Agent a : world.getAgents()){
+			if(!a.isPred){
+				if(a.posY <= this.posY - 2)
+					return 0;
+				if(a.posX <= this.posX + 2)
+					return 1;
+				if(a.posY <= this.posY + 2)
+					return 2;
+				if(a.posX <= this.posX - 2)
+					return 3;
+			}
+		}
+		//Le loup se deplace au hasard
+		if ( Math.random() > 0.5 ) // au hasard
+			return (direction+1) %4;
+		else
+			return (direction-1+4) %4;
+	}
+	
 	@Override
 	public void Step() {
 		//On mange avant de se deplacer
@@ -64,12 +85,7 @@ public class Loup extends Pred {
 			rt = reprodTime;
 		}
 		
-		//Le loup se deplace au hasard
-		if ( Math.random() > 0.5 ) // au hasard
-			direction = (direction+1) %4;
-		else
-			direction = (direction-1+4) %4;
-		
+		direction = chasser();
 		
 		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
 		if(isObstacleDirection(direction)){

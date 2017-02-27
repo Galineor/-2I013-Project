@@ -59,8 +59,10 @@ public class SpriteDemo extends JPanel {
 		
 		myMap = new Map(tailleX, tailleY);
 		for(int i=0; i< 20; i++){
-			myMap.getAgents().add(new Loup(myMap));
 			myMap.getAgents().add(new Mouton(myMap));
+		}
+		for(int i=0; i< 20; i++){
+			myMap.getAgents().add(new Loup(myMap));
 		}
 	}
 

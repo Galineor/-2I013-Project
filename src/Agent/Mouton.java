@@ -1,7 +1,6 @@
 package Agent;
 
-import Environnement.Map;
-import Environnement.World;
+import Environnement.*;
 
 public class Mouton extends Prey {
 
