@@ -4,22 +4,24 @@ import Environnement.*;
 
 public class Loup extends Pred {
 
-	public Loup(World world) {
+	public Loup(Map world) {
 		super(world, 100, 150);
 		this.posX = (int)(Math.random()*world.getWidth());
 		this.posY = (int)(Math.random()*world.getHeight());
 		this.direction = (int)(Math.random()*4);
 		this.rt = reprodTime;
 		this.ht = hungerTime;
+		this.directionPrec = -1;
 	}
 	
-	public Loup(World world, int x, int y) {
+	public Loup(Map world, int x, int y) {
 		super(world, 100, 150);
 		this.posX = x;
 		this.posY = y;
 		this.direction = (int)(Math.random()*4);
 		this.rt = reprodTime;
 		this.ht = hungerTime;
+		this.directionPrec = -1;
 	}
 	
 	public boolean manger(){
@@ -43,28 +45,31 @@ public class Loup extends Pred {
 				return;
 			}
 		}	
-		((Map)world).getToAdd().add(new Loup(world, this.posX, this.posY));
+		(world).getToAdd().add(new Loup(world, this.posX, this.posY));
 	}
-	
-	public int chasser(){
 		
+	public void chasser(){
 		for (Agent a : world.getAgents()){
 			if(!a.isPred){
-				if(a.posY <= this.posY - 2)
-					return 0;
-				if(a.posX <= this.posX + 2)
-					return 1;
-				if(a.posY <= this.posY + 2)
-					return 2;
-				if(a.posX <= this.posX - 2)
-					return 3;
+				if(a.posY <= this.posY - 4)
+					this.direction = 0;
+				if(a.posX <= this.posX + 4)
+					this.direction = 1;
+				if(a.posY <= this.posY + 4)
+					this.direction = 2;
+				if(a.posX <= this.posX - 4)
+					this.direction = 3;
 			}
 		}
 		//Le loup se deplace au hasard
 		if ( Math.random() > 0.5 ) // au hasard
-			return (direction+1) %4;
+			direction =  (direction+1) %4;
 		else
-			return (direction-1+4) %4;
+			direction = (direction-1+4) %4;
+		
+		if(directionPrec>0 && direction == (directionPrec+2)%4){
+			direction = (direction+2)%4;
+		}
 	}
 	
 	@Override
@@ -85,7 +90,7 @@ public class Loup extends Pred {
 			rt = reprodTime;
 		}
 		
-		direction = chasser();
+		chasser();
 		
 		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
 		if(isObstacleDirection(direction)){
@@ -133,5 +138,7 @@ public class Loup extends Pred {
 		 
 		 ht--;
 		 rt--;
+		 
+		 this.directionPrec = this.direction;
 	}
 }

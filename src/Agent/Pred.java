@@ -1,6 +1,6 @@
 package Agent;
 
-import Environnement.World;
+import Environnement.*;
 
 public abstract class Pred extends Agent {
 	protected final int hungerTime;
@@ -24,7 +24,7 @@ public abstract class Pred extends Agent {
 		this.rt = rt;
 	}
 
-	public Pred(World world, int hungerTime, int reprodTime) {
+	public Pred(Map world, int hungerTime, int reprodTime) {
 		super(true, world);
 		this.hungerTime = hungerTime;
 		this.reprodTime = reprodTime;

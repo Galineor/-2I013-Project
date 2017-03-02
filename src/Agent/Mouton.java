@@ -4,11 +4,37 @@ import Environnement.*;
 
 public class Mouton extends Prey {
 
-	public Mouton(World world) {
+	public Mouton(Map world) {
 		super(world);
 		this.posX = (int)(Math.random()*world.getWidth());
 		this.posY = (int)(Math.random()*world.getHeight());
 		this.direction = (int)(Math.random()*4);
+		this.champDeVision = 2;
+	}
+	
+	//Regarde les alentours de la proie et engage la fuite de la proe vers une zone (peut etre) safe
+	public void fuite(){
+		for(Agent a: world.getAgents()){
+			if(a.isPred){
+				//Si le predateur se trouve dans le champ de vision
+				if(a.getPosX() >= this.posX - champDeVision && a.getPosX() <= this.posX + champDeVision &&
+						a.getPosY() >= this.posY - this.champDeVision && a.getPosY() <= this.posY + this.champDeVision){
+					//TODO
+					//Faire un algo intéressant pour la fuite avec une part d'aleatoire
+					
+					//Pour l'instant le mouton prend juste la direction du predateur proche pour l'eviter
+					if(a.getPosX() < this.posX){
+						this.direction = 1;
+					}else if(a.getPosX() > this.posX){
+						this.direction = 3;
+					}else if(a.getPosY() < this.posY){
+						this.direction = 2;
+					}else if(a.getPosY() > this.posY){
+						this.direction = 0;
+					}
+				}
+			}
+		}
 	}
 	
 
@@ -19,8 +45,9 @@ public class Mouton extends Prey {
 			direction = (direction+1) %4;
 		else
 			direction = (direction-1+4) %4;
-
 		
+		
+		fuite();
 		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
 		if(isObstacleDirection(direction)){
 			if ( Math.random() > 0.5 ){ // au hasard

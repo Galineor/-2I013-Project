@@ -12,9 +12,10 @@ public abstract class Agent {
 	protected int posY;
 	
 	protected int direction;
-	protected World world;
+	protected int directionPrec; //On save la direction precedente pour ne pas retourner sur pas;
+	protected Map world;
 	
-	public Agent(boolean isPred, World world){
+	public Agent(boolean isPred, Map world){
 		this.direction = 0;
 		this.isAlive = true;
 		this.world = world;
@@ -77,22 +78,22 @@ public abstract class Agent {
 	public boolean isObstacleDirection(int d){
 		switch(d){
 		case 0:
-			if(((Map)world).getTerrain()[posX][(posY - 1 + world.getHeight()) % world.getHeight()][2] == 0){
+			if((world).getTerrain()[posX][(posY - 1 + world.getHeight()) % world.getHeight()][2] == 0){
 				return false;
 			}
 			break;
 		case 1:
-			if(((Map)world).getTerrain()[ (posX + 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
+			if((world).getTerrain()[ (posX + 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
 				return false;
 			}
 			break;
 		case 2:
-			if(((Map)world).getTerrain()[posX][(posY + 1 + world.getHeight()) % world.getHeight()][2] == 0){
+			if((world).getTerrain()[posX][(posY + 1 + world.getHeight()) % world.getHeight()][2] == 0){
 				return false;
 			}
 			break;
 		case 3:
-			if(((Map)world).getTerrain()[(posX - 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
+			if((world).getTerrain()[(posX - 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
 				return false;
 			}
 			break;
