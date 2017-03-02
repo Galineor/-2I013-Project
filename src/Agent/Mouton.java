@@ -49,11 +49,11 @@ public class Mouton extends Prey {
 		
 		fuite();
 		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
-		if(isObstacleDirection(direction)){
+		if(isWaterDirection(direction)){
 			if ( Math.random() > 0.5 ){ // au hasard
 				for(int i=0; i<3; i++){
 					direction = (direction+1) %4;
-					if(!isObstacleDirection(direction)){
+					if(!isWaterDirection(direction)){
 						break;
 					}
 				}
@@ -61,7 +61,7 @@ public class Mouton extends Prey {
 			else{
 				for(int i=0; i<3; i++){
 					direction = (direction-1+4) %4;
-					if(!isObstacleDirection(direction)){
+					if(!isWaterDirection(direction)){
 						break;
 					}
 				}
@@ -69,7 +69,7 @@ public class Mouton extends Prey {
 		}
 		
 		// met a jour: la position de l'agent (depend de l'orientation)
-		if(!isObstacleDirection(direction)){
+		if(!isWaterDirection(direction)){
 			 switch ( direction ) 
 			 {
 	         	case 0: // nord

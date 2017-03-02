@@ -28,7 +28,6 @@ public abstract class Pred extends Agent {
 		super(true, world);
 		this.hungerTime = hungerTime;
 		this.reprodTime = reprodTime;
-		// TODO Auto-generated constructor stub
 	}
 	
 	public abstract boolean manger();

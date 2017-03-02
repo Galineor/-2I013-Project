@@ -67,6 +67,7 @@ public class Loup extends Pred {
 		else
 			direction = (direction-1+4) %4;
 		
+		//Permet d'éviter les deplacements avant/arriere en boucle, rendant la simulation plus realiste
 		if(directionPrec>0 && direction == (directionPrec+2)%4){
 			direction = (direction+2)%4;
 		}
@@ -93,11 +94,11 @@ public class Loup extends Pred {
 		chasser();
 		
 		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
-		if(isObstacleDirection(direction)){
+		if(isWaterDirection(direction)){
 			if ( Math.random() > 0.5 ){ // au hasard
 				for(int i=0; i<3; i++){
 					direction = (direction+1) %4;
-					if(!isObstacleDirection(direction)){
+					if(!isWaterDirection(direction)){
 						break;
 					}
 				}
@@ -105,7 +106,7 @@ public class Loup extends Pred {
 			else{
 				for(int i=0; i<3; i++){
 					direction = (direction-1+4) %4;
-					if(!isObstacleDirection(direction)){
+					if(!isWaterDirection(direction)){
 						break;
 					}
 				}
@@ -113,7 +114,7 @@ public class Loup extends Pred {
 		}
 		
 		// met a jour: la position de l'agent (depend de l'orientation)
-		if(!isObstacleDirection(direction)){
+		if(!isWaterDirection(direction)){
 			 switch ( direction ) 
 			 {
 	         	case 0: // nord

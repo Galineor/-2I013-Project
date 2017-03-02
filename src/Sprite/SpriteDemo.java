@@ -58,12 +58,12 @@ public class SpriteDemo extends JPanel {
 		
 		
 		myMap = new Map(tailleX, tailleY);
-//		for(int i=0; i< 20; i++){
-//			myMap.getAgents().add(new Loup(myMap));
-//		}
-//		for(int i=0; i< 20; i++){
-//			myMap.getAgents().add(new Mouton(myMap));
-//		}
+		for(int i=0; i< 20; i++){
+			myMap.getAgents().add(new Loup(myMap));
+		}
+		for(int i=0; i< 20; i++){
+			myMap.getAgents().add(new Mouton(myMap));
+		}
 		
 	}
 
@@ -91,15 +91,15 @@ public class SpriteDemo extends JPanel {
 			}
 		
 		
-//		for(Agent a : myMap.getAgents()){
-//			if(a.isAlive()){
-//				if(a instanceof Loup){
-//					g2.drawImage(loupSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
-//				}else if(a instanceof Mouton){
-//					g2.drawImage(moutonSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
-//				}
-//			}
-//		}
+		for(Agent a : myMap.getAgents()){
+			if(a.isAlive()){
+				if(a instanceof Loup){
+					g2.drawImage(loupSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
+				}else if(a instanceof Mouton){
+					g2.drawImage(moutonSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
+				}
+			}
+		}
 	}
 	
 	public void Step(){

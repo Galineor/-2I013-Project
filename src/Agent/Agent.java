@@ -75,31 +75,31 @@ public abstract class Agent {
 	}
 	
 	
-	public boolean isObstacleDirection(int d){
+	public boolean isWaterDirection(int d){
 		switch(d){
 		case 0:
-			if((world).getTerrain()[posX][(posY - 1 + world.getHeight()) % world.getHeight()][2] == 0){
-				return false;
+			if(world.getTerrain()[posX][(posY - 1 + world.getHeight()) % world.getHeight()].type == 2){
+				return true;
 			}
 			break;
 		case 1:
-			if((world).getTerrain()[ (posX + 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
-				return false;
+			if(world.getTerrain()[ (posX + 1 + world.getWidth()) % world.getWidth()][posY].type== 2){
+				return true;
 			}
 			break;
 		case 2:
-			if((world).getTerrain()[posX][(posY + 1 + world.getHeight()) % world.getHeight()][2] == 0){
-				return false;
+			if(world.getTerrain()[posX][(posY + 1 + world.getHeight()) % world.getHeight()].type == 2){
+				return true;
 			}
 			break;
 		case 3:
-			if((world).getTerrain()[(posX - 1 + world.getWidth()) % world.getWidth()][posY][2] == 0){
-				return false;
+			if(world.getTerrain()[(posX - 1 + world.getWidth()) % world.getWidth()][posY].type == 2){
+				return true;
 			}
 			break;
 		}
 		
-		return true;
+		return false;
 	}
 
 
