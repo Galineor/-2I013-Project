@@ -58,12 +58,12 @@ public class SpriteDemo extends JPanel {
 		
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< 20; i++){
-			myMap.getAgents().add(new Loup(myMap));
-		}
-		for(int i=0; i< 20; i++){
-			myMap.getAgents().add(new Mouton(myMap));
-		}
+//		for(int i=0; i< 20; i++){
+//			myMap.getAgents().add(new Loup(myMap));
+//		}
+//		for(int i=0; i< 20; i++){
+//			myMap.getAgents().add(new Mouton(myMap));
+//		}
 		
 	}
 
@@ -72,33 +72,34 @@ public class SpriteDemo extends JPanel {
 		for ( int i = 0 ; i < myMap.getTerrain().length ; i++ )
 			for ( int j = 0 ; j < myMap.getTerrain()[0].length ; j++ ){
 				
-				if ( myMap.getTerrain()[i][j][0] == 0){
-					//Affiche une plaine
-					if (myMap.getWater()[i][j] > 0)
-						g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-					else
-						g2.drawImage(grassSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-				}else if(myMap.getTerrain()[i][j][0] == 1){
+				if ( myMap.getTerrain()[i][j].type == 0){
+					//affiche plaine
+					g2.drawImage(grassSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					
+				}else if(myMap.getTerrain()[i][j].type == 1){
+					//affiche desert
 					g2.drawImage(desertSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-				}
+				}else if(myMap.getTerrain()[i][j].type == 2)
+					//affiche l eau
+					g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 				
-				if (myMap.getTerrain()[i][j][2] == 2)
-					if (myMap.getTerrain()[i][j][0] == 0)
+				if (myMap.getTerrain()[i][j].isTree)
+					if (myMap.getTerrain()[i][j].type == 0)
 						g2.drawImage(treeSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-					else
+					else if (myMap.getTerrain()[i][j].type == 1)
 						g2.drawImage(rockSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 			}
 		
 		
-		for(Agent a : myMap.getAgents()){
-			if(a.isAlive()){
-				if(a instanceof Loup){
-					g2.drawImage(loupSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
-				}else if(a instanceof Mouton){
-					g2.drawImage(moutonSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
-				}
-			}
-		}
+//		for(Agent a : myMap.getAgents()){
+//			if(a.isAlive()){
+//				if(a instanceof Loup){
+//					g2.drawImage(loupSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
+//				}else if(a instanceof Mouton){
+//					g2.drawImage(moutonSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
+//				}
+//			}
+//		}
 	}
 	
 	public void Step(){
