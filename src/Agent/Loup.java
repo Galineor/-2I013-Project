@@ -30,7 +30,7 @@ public class Loup extends Pred {
 	
 	public boolean manger(){
 		for(Agent a : world.getAgents()){
-			if(!a.isPred && a.getPosX() == this.posX && a.getPosY() == this.posY){
+			if(!a.isPred && a.isAlive() && a.getPosX() == this.posX && a.getPosY() == this.posY){
 				a.setAlive(false);
 				return true;
 			}
@@ -46,6 +46,8 @@ public class Loup extends Pred {
 				a.setPosY(this.posY);
 				((Pred)a).setRt(reprodTime);
 				((Pred)a).setHt(hungerTime);
+				a.directionPrec = -1;
+				((Loup)a).isChasing = false;
 				return;
 			}
 		}	
@@ -54,7 +56,7 @@ public class Loup extends Pred {
 		
 	public void chasser(){
 		for (Agent a : world.getAgents()){
-			if(!a.isPred){
+			if(!a.isPred && a.isAlive()){
 				if(a.posY >= this.posY - 4 && a.posY<=this.posY && a.posX == this.posX){
 					this.direction = 0;
 					isChasing = true;
@@ -77,15 +79,16 @@ public class Loup extends Pred {
 	
 	@Override
 	public void Step() {
+		//Si le loup a trop faim, il meurt
+		if(ht <= 0){
+			this.setAlive(false);
+			return;
+		}
 		//On mange avant de se deplacer
 		if(manger()){
 			ht = hungerTime;
 		}
-		
-		//Si le loup a trop faim, il meurt
-		if(ht == 0){
-			this.setAlive(false);
-		}
+
 		
 		//Le loup se reproduit apres reprodTime iterations
 		if(rt == 0){
@@ -153,6 +156,8 @@ public class Loup extends Pred {
 	         	case 3:	// ouest
 	         		posX = ( posX - 1 + world.getWidth() ) % world.getWidth();
 	 				break;
+	 			default:
+	 				System.out.println("PROBLEME");
 			 }
 		}
 		
