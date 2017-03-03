@@ -3,6 +3,8 @@ package Agent;
 import Environnement.*;
 
 public class Loup extends Pred {
+	
+	private boolean isChasing;
 
 	public Loup(Map world) {
 		super(world, 100, 150);
@@ -12,6 +14,7 @@ public class Loup extends Pred {
 		this.rt = reprodTime;
 		this.ht = hungerTime;
 		this.directionPrec = -1;
+		this.isChasing = false;
 	}
 	
 	public Loup(Map world, int x, int y) {
@@ -22,6 +25,7 @@ public class Loup extends Pred {
 		this.rt = reprodTime;
 		this.ht = hungerTime;
 		this.directionPrec = -1;
+		this.isChasing = false;
 	}
 	
 	public boolean manger(){
@@ -51,25 +55,23 @@ public class Loup extends Pred {
 	public void chasser(){
 		for (Agent a : world.getAgents()){
 			if(!a.isPred){
-				if(a.posY <= this.posY - 4)
+				if(a.posY >= this.posY - 4 && a.posY<=this.posY && a.posX == this.posX){
 					this.direction = 0;
-				if(a.posX <= this.posX + 4)
+					isChasing = true;
+				}
+				if(a.posX <= this.posX + 4 && a.posX>=this.posX && a.posY == this.posY){
 					this.direction = 1;
-				if(a.posY <= this.posY + 4)
-					this.direction = 2;
-				if(a.posX <= this.posX - 4)
+					isChasing = true;
+				}
+				if(a.posY <= this.posY + 4 && a.posY>=this.posY && a.posX == this.posX){
+					this.direction = 2;			
+					isChasing = true;
+				}
+				if(a.posX >= this.posX - 4 && a.posX<=this.posX && a.posY == this.posY){
 					this.direction = 3;
+					isChasing = true;
+				}
 			}
-		}
-		//Le loup se deplace au hasard
-		if ( Math.random() > 0.5 ) // au hasard
-			direction =  (direction+1) %4;
-		else
-			direction = (direction-1+4) %4;
-		
-		//Permet d'éviter les deplacements avant/arriere en boucle, rendant la simulation plus realiste
-		if(directionPrec>0 && direction == (directionPrec+2)%4){
-			direction = (direction+2)%4;
 		}
 	}
 	
@@ -90,8 +92,30 @@ public class Loup extends Pred {
 			reproduire();
 			rt = reprodTime;
 		}
+
 		
+		isChasing = false; //A chaque debut de tour, on ne sait pas si le loup est entrain de chasser
 		chasser();
+		
+		//Permet d'ï¿½viter les deplacements avant/arriere en boucle, rendant la simulation plus realiste
+		if(!isChasing && directionPrec>0 && direction == (directionPrec+2)%4){
+			if ( Math.random() > 0.5 ){ // au hasard
+				for(int i=0; i<3; i++){
+					direction = (direction+1) %4;
+					if(!isWaterDirection(direction)){
+						break;
+					}
+				}
+			}
+			else{
+				for(int i=0; i<3; i++){
+					direction = (direction-1+4) %4;
+					if(!isWaterDirection(direction)){
+						break;
+					}
+				}
+			}
+		}
 		
 		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
 		if(isWaterDirection(direction)){
