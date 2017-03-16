@@ -5,16 +5,11 @@ import Environnement.*;
 public class Loup extends Pred {
 	
 	private boolean isChasing;
+	public final int ageAdulte = 40;
+	public final int ageVieux = 100;
 
 	public Loup(Map world) {
-		super(world, 100, 150);
-		this.posX = (int)(Math.random()*world.getWidth());
-		this.posY = (int)(Math.random()*world.getHeight());
-		this.direction = (int)(Math.random()*4);
-		this.rt = reprodTime;
-		this.ht = hungerTime;
-		this.directionPrec = -1;
-		this.isChasing = false;
+		this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
 	}
 	
 	public Loup(Map world, int x, int y) {
@@ -26,6 +21,8 @@ public class Loup extends Pred {
 		this.ht = hungerTime;
 		this.directionPrec = -1;
 		this.isChasing = false;
+		this.parent = null;
+		this.age = 0;
 	}
 	
 	public boolean manger(){
@@ -48,6 +45,8 @@ public class Loup extends Pred {
 				((Pred)a).setHt(hungerTime);
 				a.directionPrec = -1;
 				((Loup)a).isChasing = false;
+				a.setAge(0);
+				a.setParent(this);
 				return;
 			}
 		}	
@@ -84,6 +83,46 @@ public class Loup extends Pred {
 			this.setAlive(false);
 			return;
 		}
+		System.out.println(age);
+		if(age<40){
+			comportementJeune();
+		}else{
+			comportementAdulte();
+		}
+		age++;
+		 this.directionPrec = this.direction;
+	}
+
+	@Override
+	public void comportementJeune() {
+		// TODO Auto-generated method stub
+		
+		/* 
+		 * Suit le parent
+		 * Pas necessaire de manger
+		 * Pas de reproduction
+		 * Endurance forte
+		 */
+		if(parent != null && parent.isAlive()){
+			this.setPosX(parent.getPosX());
+			this.setPosY(parent.getPosY());
+		}else{
+			age = ageAdulte;
+		}
+		
+		
+	}
+
+	@Override
+	public void comportementAdulte() {
+		// TODO Auto-generated method stub
+		/*
+		 * Chasse
+		 * Reproduction
+		 * Comportement en meute
+		 * Endurance normale
+		 */
+		
 		//On mange avant de se deplacer
 		if(manger()){
 			ht = hungerTime;
@@ -163,12 +202,24 @@ public class Loup extends Pred {
 		
 		
 		 if(manger()){
-				ht = hungerTime;
-			}
+			ht = hungerTime;
+		}
 		 
 		 ht--;
 		 rt--;
 		 
 		 this.directionPrec = this.direction;
+}
+
+
+	@Override
+	public void comportementVieux() {
+		// TODO Auto-generated method stub
+		
+		/*
+		 * Moins d'endurance
+		 * Plus petit champ de vision
+		 * 
+		 */
 	}
 }

@@ -5,11 +5,18 @@ import Environnement.*;
 public class Mouton extends Prey {
 
 	public Mouton(Map world) {
-		super(world);
-		this.posX = (int)(Math.random()*world.getWidth());
-		this.posY = (int)(Math.random()*world.getHeight());
+		this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
+	}
+	
+	public Mouton(Map world, int posx, int posy){
+		super(world, 100, 110);
+		this.posX = posx;
+		this.posY = posy;
 		this.direction = (int)(Math.random()*4);
 		this.champDeVision = 2;
+		this.ht = hungerTime;
+		this.rt = reprodTime;
+		this.parent=null;
 	}
 	
 	//Regarde les alentours de la proie et engage la fuite de la proe vers une zone (peut etre) safe
@@ -37,6 +44,23 @@ public class Mouton extends Prey {
 		}
 	}
 	
+	public void reproduire(){
+		for(Agent a : world.getAgents()){
+			if(!a.isPred && !a.isAlive){
+				a.setAlive(true);
+				a.setPosX(this.posX);
+				a.setPosY(this.posY);
+				((Prey)a).setRt(reprodTime);
+				((Prey)a).setHt(hungerTime);
+				a.directionPrec = -1;
+				a.setAge(0);
+				a.setParent(this);
+				return;
+			}
+		}	
+		(world).getToAdd().add(new Mouton(world, this.posX, this.posY));
+	}
+	
 
 	@Override
 	public void Step() {
@@ -46,9 +70,12 @@ public class Mouton extends Prey {
 		else
 			direction = (direction-1+4) %4;
 		
+		if(rt == 0){
+			reproduire();
+		}
+		
 		
 		fuite();
-		//Si le loup ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
 		if(isWaterDirection(direction)){
 			if ( Math.random() > 0.5 ){ // au hasard
 				for(int i=0; i<3; i++){
@@ -86,5 +113,26 @@ public class Mouton extends Prey {
 	 				break;
 			 }
 		}
+		
+		rt--;
+		ht--;
+	}
+
+	@Override
+	public void comportementJeune() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void comportementAdulte() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void comportementVieux() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -15,6 +15,25 @@ public abstract class Agent {
 	protected int directionPrec; //On save la direction precedente pour ne pas retourner sur pas;
 	protected Map world;
 	
+	protected int age;
+	protected Agent parent;
+
+	public Agent getParent() {
+		return parent;
+	}
+
+	public void setParent(Agent parent) {
+		this.parent = parent;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
 	public Agent(boolean isPred, Map world){
 		this.direction = 0;
 		this.isAlive = true;
@@ -102,6 +121,12 @@ public abstract class Agent {
 		return false;
 	}
 
-
+	public abstract void comportementJeune();
+	
+	public abstract void comportementAdulte();
+	
+	public abstract void comportementVieux();
+	
+	
 
 }
