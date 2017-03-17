@@ -10,7 +10,20 @@ public abstract class Agent {
 	
 	protected int posX;
 	protected int posY;
+	protected int prevPosX;
+	protected int prevPosY;
 	
+	protected int spritePosX;
+	protected int spritePosY;
+	
+	public int getSpritePosX() {
+		return spritePosX;
+	}
+
+	public int getSpritePosY() {
+		return spritePosY;
+	}
+
 	protected int direction;
 	protected int directionPrec; //On save la direction precedente pour ne pas retourner sur pas;
 	protected Map world;
@@ -39,10 +52,50 @@ public abstract class Agent {
 		this.isAlive = true;
 		this.world = world;
 		this.isPred = isPred;
+		this.spritePosX = this.spritePosY = -1;
 	}
 	
 	public abstract void Step();
+	
+	protected void updatePrevPos(){
+		this.prevPosX = this.posX;
+		this.prevPosY = this.posY;
+		this.spritePosX = 0;
+		this.spritePosY = 0;
+	}
+	
+	public void StepSprite(){		
+		if(prevPosX != -1 && prevPosY != -1){
+			if(prevPosX != this.posX || prevPosY != this.posY){
+				if(prevPosX == posX-1){
+					spritePosX++;
+				}else if(prevPosX == posX+1){
+					spritePosX--;
+				}else if(prevPosY == posY-1){
+					spritePosY++;
+				}else if(prevPosY == posY+1){
+					spritePosY--;
+				}
+			}
+		}
+	}
 
+
+	public int getPrevPosX() {
+		return prevPosX;
+	}
+
+	public void setPrevPosX(int prevPosX) {
+		this.prevPosX = prevPosX;
+	}
+
+	public int getPrevPosY() {
+		return prevPosY;
+	}
+
+	public void setPrevPosY(int prevPosY) {
+		this.prevPosY = prevPosY;
+	}
 
 	public boolean isPred() {
 		return isPred;

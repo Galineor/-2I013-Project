@@ -22,6 +22,8 @@ public class Loup extends Pred {
 		this.directionPrec = -1;
 		this.isChasing = false;
 		this.parent = null;
+		this.prevPosX = -1;
+		this.prevPosY = -1;
 		this.age = 0;
 	}
 	
@@ -47,6 +49,8 @@ public class Loup extends Pred {
 				((Loup)a).isChasing = false;
 				a.setAge(0);
 				a.setParent(this);
+				a.setPrevPosX(-1);
+				a.setPrevPosY(-1);
 				return;
 			}
 		}	
@@ -76,14 +80,15 @@ public class Loup extends Pred {
 		}
 	}
 	
+	
 	@Override
 	public void Step() {
+		 updatePrevPos();
 		//Si le loup a trop faim, il meurt
 		if(ht <= 0){
 			this.setAlive(false);
 			return;
 		}
-		System.out.println(age);
 		if(age<40){
 			comportementJeune();
 		}else{
@@ -92,7 +97,9 @@ public class Loup extends Pred {
 		age++;
 		 this.directionPrec = this.direction;
 	}
+	
 
+	
 	@Override
 	public void comportementJeune() {
 		// TODO Auto-generated method stub
@@ -108,6 +115,7 @@ public class Loup extends Pred {
 			this.setPosY(parent.getPosY());
 		}else{
 			age = ageAdulte;
+			comportementAdulte();
 		}
 		
 		
@@ -138,7 +146,6 @@ public class Loup extends Pred {
 		
 		isChasing = false; //A chaque debut de tour, on ne sait pas si le loup est entrain de chasser
 		chasser();
-		
 		//Permet d'�viter les deplacements avant/arriere en boucle, rendant la simulation plus realiste
 		if(!isChasing && directionPrec>0 && direction == (directionPrec+2)%4){
 			if ( Math.random() > 0.5 ){ // au hasard

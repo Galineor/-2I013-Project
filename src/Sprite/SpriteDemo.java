@@ -28,7 +28,7 @@ public class SpriteDemo extends JPanel {
 	private Image moutonSprite;
 	
 	private int spriteLength = 16;
-	private static int delai = 500;
+	private static int delai = 25;
 	
 	private int tailleX =50, tailleY = 50;
 	private Map myMap;
@@ -58,10 +58,10 @@ public class SpriteDemo extends JPanel {
 		
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< 20; i++){
+		for(int i=0; i< 50; i++){
 			myMap.getAgents().add(new Loup(myMap));
 		}
-		for(int i=0; i< 20; i++){
+		for(int i=0; i< 50; i++){
 			myMap.getAgents().add(new Mouton(myMap));
 		}
 		
@@ -94,9 +94,9 @@ public class SpriteDemo extends JPanel {
 		for(Agent a : myMap.getAgents()){
 			if(a.isAlive()){
 				if(a instanceof Loup){
-					g2.drawImage(loupSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
+					g2.drawImage(loupSprite,spriteLength*a.getPrevPosX()+a.getSpritePosX(),spriteLength*a.getPrevPosY() + a.getSpritePosY(),spriteLength,spriteLength, frame);
 				}else if(a instanceof Mouton){
-					g2.drawImage(moutonSprite,spriteLength*a.getPosX(),spriteLength*a.getPosY(),spriteLength,spriteLength, frame);
+					g2.drawImage(moutonSprite,spriteLength*a.getPrevPosX()+a.getSpritePosX(),spriteLength*a.getPrevPosY() + a.getSpritePosY(),spriteLength,spriteLength, frame);
 				}
 			}
 		}
@@ -105,17 +105,31 @@ public class SpriteDemo extends JPanel {
 	public void Step(){
 		myMap.Step();
 		repaint();
-	}
-
-	public static void main(String[] args) {
-		SpriteDemo monSpriteDemo = new SpriteDemo();
-		for(int i=0; i<1000; i++){
+		for(int i=0; i<=spriteLength; i++){
+			for(Agent a : myMap.getAgents()){
+				if(a.isAlive()){
+					a.StepSprite();
+				}
+			}
+			repaint();
 			try {
 				Thread.sleep(delai);
 			} catch (InterruptedException e) 
 			{
 			}
+		}
+	}
+
+	public static void main(String[] args) {
+		SpriteDemo monSpriteDemo = new SpriteDemo();
+		for(int i=0; i<1000; i++){
+			
 			monSpriteDemo.Step();
+//			try {
+//			Thread.sleep(delai);
+//		} catch (InterruptedException e) 
+//		{
+//		}
 		}
 		
 	}

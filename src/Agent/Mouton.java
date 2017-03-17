@@ -17,6 +17,8 @@ public class Mouton extends Prey {
 		this.ht = hungerTime;
 		this.rt = reprodTime;
 		this.parent=null;
+		this.prevPosX = -1;
+		this.prevPosY = -1;
 	}
 	
 	//Regarde les alentours de la proie et engage la fuite de la proe vers une zone (peut etre) safe
@@ -55,15 +57,17 @@ public class Mouton extends Prey {
 				a.directionPrec = -1;
 				a.setAge(0);
 				a.setParent(this);
+				a.setPrevPosX(-1);
+				a.setPrevPosY(-1);
 				return;
 			}
 		}	
 		(world).getToAdd().add(new Mouton(world, this.posX, this.posY));
 	}
-	
 
 	@Override
 	public void Step() {
+		 updatePrevPos();
 		// TODO Auto-generated method stub
 		if ( Math.random() > 0.5 ) // au hasard
 			direction = (direction+1) %4;
@@ -116,6 +120,7 @@ public class Mouton extends Prey {
 		
 		rt--;
 		ht--;
+		
 	}
 
 	@Override
