@@ -62,7 +62,7 @@ public class Mouton extends Prey {
 				return;
 			}
 		}	
-		(world).getToAdd().add(new Mouton(world, this.posX, this.posY));
+		(world).getAgents().add(new Mouton(world, this.posX, this.posY));
 	}
 
 	@Override

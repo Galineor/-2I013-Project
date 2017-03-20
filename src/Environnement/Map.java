@@ -10,7 +10,6 @@ public class Map {
 	private Terrain[][] terrain;
 	private final int dx, dy;
 	protected int water [][];
-	private ArrayList<Agent> toAdd;
 	private ArrayList<Agent> agents;
 	
 	
@@ -20,9 +19,7 @@ public class Map {
 		
 		terrain = new Terrain[dx][dy];
 
-		agents = new ArrayList<Agent>();
-		toAdd = new ArrayList<Agent>();
-		
+		agents = new ArrayList<Agent>();		
 		boolean tree;
 		
 		for (int x = 0; x < terrain.length; x++) {
@@ -65,9 +62,6 @@ public class Map {
 			else
 				a.updatePrevPos(); // Si on le met pas a jour, on modifie sa position précédente ( permet l'affichage d'agents immobile )
 		}
-
-		agents.addAll(toAdd);
-		toAdd = new ArrayList<Agent>();
 	}
 	
 	public void StepWorld(){
@@ -151,9 +145,5 @@ public class Map {
 	
 	public ArrayList<Agent> getAgents(){
 		return this.agents;
-	}
-	
-	public ArrayList<Agent> getToAdd(){
-		return this.toAdd;
 	}
 }
