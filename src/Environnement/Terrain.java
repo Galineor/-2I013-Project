@@ -6,7 +6,7 @@ public class Terrain {
 	public int altitude;
 	public int water;
 	public boolean isTree;
-	private boolean isOnFire = false;
+	private int AFA = 0; //0= Alive  1= Fire 2=Ashes
 	private boolean PheroPrey = false;
 	private boolean PheroPred = false;
 	
@@ -21,10 +21,6 @@ public class Terrain {
 		this(0,0,0,false);
 	}
 
-	public boolean isOnFire() {
-		return isOnFire;
-	}
-
 	public boolean isPheroPrey() {
 		return PheroPrey;
 	}
@@ -32,5 +28,15 @@ public class Terrain {
 	public boolean isPheroPred() {
 		return PheroPred;
 	}
+
+	public int getAFA() {
+		return AFA;
+	}
+
+	public void setAFA(int aFA) {
+		AFA = aFA;
+	}
+	
+	
 	
 }

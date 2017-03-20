@@ -21,14 +21,6 @@ public class Map {
 		agents = new ArrayList<Agent>();
 		toAdd = new ArrayList<Agent>();
 		
-		//for (int  x = 0; x < dx; x++){
-		//	for(int y = 0; y < dy; y++){
-		//		terrain[x][y][0] = (int)(Math.random()*2); //definie le type de terrain
-		//		terrain[x][y][1] = 0; //definie l'altitude du terrain
-		//		terrain[x][y][2] = 0; //definie les obstacles du terrain
-		//	}
-		//}
-		
 		boolean tree;
 		
 		for (int x = 0; x < terrain.length; x++) {
@@ -41,7 +33,7 @@ public class Map {
 				//initialisation du terrain
 				if (x > terrain.length/2 && y > terrain.length/2)
 					//cree une case de desert
-					terrain[x][y] = new Terrain(1, 0, 0, tree); 
+					terrain[x][y] = new Terrain(1, 0, 0, tree);
 				else if (x > terrain.length/2 - 2 && y > terrain.length/2 - 2)
 					//cree une transition entre le desert et la foret
 					terrain[x][y] = new Terrain ((int)(Math.random() * 2), 0 ,0 , false);
@@ -66,7 +58,7 @@ public class Map {
 	public void StepAgent(){
 		
 		for(Agent a : agents){
-			if (a.isAlive())
+			if (a.isAlive() && Math.random() < 0.80)
 				a.Step();
 		}
 
@@ -75,28 +67,60 @@ public class Map {
 	}
 	
 	public void StepWorld(){
+		majForet(terrain);
+		majEau(terrain);
+	}
+	
+	public void majForet (Terrain[][] t){
+		int x, y;
+		for(int i = 0; i < (dx*dy)/3 ; i++){
+			x = (int)(Math.random() * dx);
+			y = (int)(Math.random() * dy);
+			
+			//verifie si la case est bien un arbre
+			if(!t[x][y].isTree){
+				//fait pousser un arbre avec chance plus elevee si il y a des cendres
+				if (Math.random()<0.005 ||t[x][y].getAFA()==2 && Math.random() < 0.01)
+					t[x][y].isTree = true;
+				else
+					continue;
+			}
+			
+			//propagation du feu
+			if (t[(x-1+dx)%dx][y].getAFA() == 1 
+					||t[(x+1+dx)%dx][y].getAFA() == 1 ||t[x][(y-1+dy)%dy].getAFA() == 1 
+					||t[x][(y+1+dy)%dy].getAFA() == 1 ||Math.random() < 0.00001)
+				t[x][y].setAFA(1);
+			
+			//les arbres en feu deviennent des cendres
+			if (t[x][y].getAFA() == 1)
+				t[x][y].setAFA(2);
+		}
+	}
+	
+	public void majEau (Terrain[][] t){
 		for(int x = 0; x < dx; x++){
 			for (int y = 0; y < dy; y++){
-				if (!terrain[x][y].isTree){
-					if (terrain[(x - 1 + dx)% dx][y].water > terrain[x][y].water && terrain[(x - 1 + dx)% dx][y].water > 1){
-						terrain[x][y].water ++;
-						terrain[(x - 1 + dx)% dx][y].water --;
-						terrain[x][y].type = 2;
+				if (!t[x][y].isTree){
+					if (t[(x - 1 + dx)% dx][y].water > t[x][y].water && t[(x - 1 + dx)% dx][y].water > 1){
+						t[x][y].water ++;
+						t[(x - 1 + dx)% dx][y].water --;
+						t[x][y].type = 2;
 						
-					}if (terrain[(x + 1)% dx][y].water > terrain[x][y].water && terrain[(x + 1)% dx][y].water > 1){
-						terrain[x][y].water ++;
-						terrain[(x + 1)% dx][y].water --;
-						terrain[x][y].type = 2;
+					}if (t[(x + 1)% dx][y].water > t[x][y].water && t[(x + 1)% dx][y].water > 1){
+						t[x][y].water ++;
+						t[(x + 1)% dx][y].water --;
+						t[x][y].type = 2;
 						
-					}if(terrain[x][(y - 1 + dy)% dy].water > terrain[x][y].water && terrain[x][(y - 1 + dx)% dx].water > 1){
-						terrain[x][y].water ++;
-						terrain[x][(y - 1 + dy)% dy].water --;
-						terrain[x][y].type = 2;
+					}if(t[x][(y - 1 + dy)% dy].water > t[x][y].water && t[x][(y - 1 + dx)% dx].water > 1){
+						t[x][y].water ++;
+						t[x][(y - 1 + dy)% dy].water --;
+						t[x][y].type = 2;
 					
-					}if(terrain[x][(y + 1)% dy].water > terrain[x][y].water && terrain[x][(y + 1)% dy].water > 1){
-						terrain[x][y].water ++;
-						terrain[x][(y + 1)% dy].water --;
-						terrain[x][y].type = 2;
+					}if(t[x][(y + 1)% dy].water > t[x][y].water && t[x][(y + 1)% dy].water > 1){
+						t[x][y].water ++;
+						t[x][(y + 1)% dy].water --;
+						t[x][y].type = 2;
 					}
 				}
 			}
