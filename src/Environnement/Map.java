@@ -1,6 +1,8 @@
 package Environnement;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import Agent.Agent;
 
 public class Map {
@@ -56,8 +58,8 @@ public class Map {
 	}
 	
 	public void StepAgent(){
-		
-		for(Agent a : agents){
+		for(Iterator<Agent> it = agents.iterator(); it.hasNext(); ){
+			Agent a = it.next();
 			if (a.isAlive() && Math.random() < 0.80)
 				a.Step();
 			else

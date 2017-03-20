@@ -28,7 +28,7 @@ public class SpriteDemo extends JPanel {
 	private Image moutonSprite;
 	
 	private int spriteLength = 16;
-	private static int delai = 20;
+	private static int delai = 1;
 	
 	private int tailleX =50, tailleY = 50;
 	private Map myMap;
