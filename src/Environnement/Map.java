@@ -1,6 +1,8 @@
 package Environnement;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import Agent.Agent;
 
 public class Map {
@@ -8,7 +10,6 @@ public class Map {
 	private Terrain[][] terrain;
 	private final int dx, dy;
 	protected int water [][];
-	private ArrayList<Agent> toAdd;
 	private ArrayList<Agent> agents;
 	
 	
@@ -18,9 +19,7 @@ public class Map {
 		
 		terrain = new Terrain[dx][dy];
 
-		agents = new ArrayList<Agent>();
-		toAdd = new ArrayList<Agent>();
-		
+		agents = new ArrayList<Agent>();		
 		boolean tree;
 		
 		for (int x = 0; x < terrain.length; x++) {
@@ -56,16 +55,13 @@ public class Map {
 	}
 	
 	public void StepAgent(){
-		
-		for(Agent a : agents){
+		for(Iterator<Agent> it = agents.iterator(); it.hasNext(); ){
+			Agent a = it.next();
 			if (a.isAlive() && Math.random() < 0.80)
 				a.Step();
 			else
 				a.updatePrevPos(); // Si on le met pas a jour, on modifie sa position précédente ( permet l'affichage d'agents immobile )
 		}
-
-		agents.addAll(toAdd);
-		toAdd = new ArrayList<Agent>();
 	}
 	
 	public void StepWorld(){
@@ -146,9 +142,5 @@ public class Map {
 	
 	public ArrayList<Agent> getAgents(){
 		return this.agents;
-	}
-	
-	public ArrayList<Agent> getToAdd(){
-		return this.toAdd;
 	}
 }

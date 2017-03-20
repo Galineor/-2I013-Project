@@ -54,7 +54,7 @@ public class Loup extends Pred {
 				return;
 			}
 		}	
-		(world).getToAdd().add(new Loup(world, this.posX, this.posY));
+		(world).getAgents().add(new Loup(world, this.posX, this.posY));
 	}
 		
 	public void chasser(){
