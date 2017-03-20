@@ -57,13 +57,14 @@ public abstract class Agent {
 	
 	public abstract void Step();
 	
-	protected void updatePrevPos(){
+	public void updatePrevPos(){
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
-		this.spritePosX = 0;
-		this.spritePosY = 0;
+		spritePosX = this.prevPosX*16;
+		spritePosY = this.prevPosY*16;
 	}
 	
+	//g2.drawImage(loupSprite,spriteLength*a.getPrevPosX()+a.getSpritePosX(),spriteLength*a.getPrevPosY() + a.getSpritePosY(),spriteLength,spriteLength, frame);
 	public void StepSprite(){		
 		if(prevPosX != -1 && prevPosY != -1){
 			if(prevPosX != this.posX || prevPosY != this.posY){
@@ -76,6 +77,9 @@ public abstract class Agent {
 				}else if(prevPosY == posY+1){
 					spritePosY--;
 				}
+			}else{
+				spritePosX = this.posX*16;
+				spritePosY = this.posY*16;
 			}
 		}
 	}

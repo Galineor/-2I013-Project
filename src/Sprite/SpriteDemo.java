@@ -28,7 +28,7 @@ public class SpriteDemo extends JPanel {
 	private Image moutonSprite;
 	
 	private int spriteLength = 16;
-	private static int delai = 25;
+	private static int delai = 20;
 	
 	private int tailleX =50, tailleY = 50;
 	private Map myMap;
@@ -94,9 +94,9 @@ public class SpriteDemo extends JPanel {
 		for(Agent a : myMap.getAgents()){
 			if(a.isAlive()){
 				if(a instanceof Loup){
-					g2.drawImage(loupSprite,spriteLength*a.getPrevPosX()+a.getSpritePosX(),spriteLength*a.getPrevPosY() + a.getSpritePosY(),spriteLength,spriteLength, frame);
+					g2.drawImage(loupSprite,a.getSpritePosX(),a.getSpritePosY(),spriteLength,spriteLength, frame);
 				}else if(a instanceof Mouton){
-					g2.drawImage(moutonSprite,spriteLength*a.getPrevPosX()+a.getSpritePosX(),spriteLength*a.getPrevPosY() + a.getSpritePosY(),spriteLength,spriteLength, frame);
+					g2.drawImage(moutonSprite,a.getSpritePosX(),a.getSpritePosY(),spriteLength,spriteLength, frame);
 				}
 			}
 		}

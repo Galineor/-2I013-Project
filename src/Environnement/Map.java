@@ -60,6 +60,8 @@ public class Map {
 		for(Agent a : agents){
 			if (a.isAlive() && Math.random() < 0.80)
 				a.Step();
+			else
+				a.updatePrevPos(); // Si on le met pas a jour, on modifie sa position précédente ( permet l'affichage d'agents immobile )
 		}
 
 		agents.addAll(toAdd);
