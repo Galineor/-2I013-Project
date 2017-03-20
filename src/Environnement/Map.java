@@ -82,21 +82,18 @@ public class Map {
 			if (t[x][y].type == 0){
 				//verifie si la case est bien un arbre
 				if(!t[x][y].isTree){
-					
 					//fait pousser un arbre avec chance plus elevee si il y a des cendres
 					if (Math.random()<0.005 ||t[x][y].getAFA()==2 && Math.random() < 0.01)
 						t[x][y].isTree = true;
 				
-				//propagation du feu
-				if (t[(x-1+dx)%dx][y].getAFA() == 1 
-						||t[(x+1+dx)%dx][y].getAFA() == 1 ||t[x][(y-1+dy)%dy].getAFA() == 1 
-						||t[x][(y+1+dy)%dy].getAFA() == 1 ||Math.random() < 0.00001)
-					t[x][y].setAFA(1);
-				
-				//les arbres en feu deviennent des cendres
-				if (t[x][y].getAFA() == 1)
-					t[x][y].setAFA(2);
-		
+					//propagation du feu
+					if (t[(x-1+dx)%dx][y].getAFA() == 1 ||t[(x+1+dx)%dx][y].getAFA() == 1 ||t[x][(y-1+dy)%dy].getAFA() == 1 
+							||t[x][(y+1+dy)%dy].getAFA() == 1 ||Math.random() < 0.00001)
+						t[x][y].setAFA(1);
+					
+					//les arbres en feu deviennent des cendres
+					if (t[x][y].getAFA() == 1)
+						t[x][y].setAFA(2);
 				}
 			}
 		}

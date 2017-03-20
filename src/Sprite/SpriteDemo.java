@@ -23,6 +23,8 @@ public class SpriteDemo extends JPanel {
 	private Image grassSprite;
 	private Image desertSprite;
 	private Image treeSprite;
+	private Image fireSprite;
+	private Image ashesSprite;
 	private Image rockSprite;
 	private Image loupSprite;
 	private Image moutonSprite;
@@ -39,6 +41,8 @@ public class SpriteDemo extends JPanel {
 		{
 			waterSprite = ImageIO.read(new File("src/water.png"));
 			treeSprite = ImageIO.read(new File("src/tree.png"));
+			fireSprite = ImageIO.read(new File("src/tree_fire.png"));
+			ashesSprite = ImageIO.read(new File("src/tree_ashes.png"));
 			rockSprite = ImageIO.read(new File("src/rock.png"));
 			grassSprite = ImageIO.read(new File("src/grass.png"));
 			desertSprite = ImageIO.read(new File("src/desert.png"));
@@ -69,7 +73,7 @@ public class SpriteDemo extends JPanel {
 
 	public void paint(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
-		for ( int i = 0 ; i < myMap.getTerrain().length ; i++ )
+		for ( int i = 0 ; i < myMap.getTerrain().length ; i++ ){
 			for ( int j = 0 ; j < myMap.getTerrain()[0].length ; j++ ){
 				
 				if ( myMap.getTerrain()[i][j].type == 0){
@@ -83,13 +87,21 @@ public class SpriteDemo extends JPanel {
 					//affiche l eau
 					g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 				
-				if (myMap.getTerrain()[i][j].isTree)
-					if (myMap.getTerrain()[i][j].type == 0)
-						g2.drawImage(treeSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+				if (myMap.getTerrain()[i][j].isTree){
+					if (myMap.getTerrain()[i][j].type == 0){
+						if(myMap.getTerrain()[i][j].getAFA()==0)
+							g2.drawImage(treeSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+						if (myMap.getTerrain()[i][j].getAFA()==1)
+							g2.drawImage(fireSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+						if (myMap.getTerrain()[i][j].getAFA()==2)
+							g2.drawImage(ashesSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					}
 					else if (myMap.getTerrain()[i][j].type == 1)
 						g2.drawImage(rockSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					
+				}
 			}
-		
+		}
 		
 		for(Agent a : myMap.getAgents()){
 			if(a.isAlive()){
