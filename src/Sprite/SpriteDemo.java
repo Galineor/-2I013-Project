@@ -62,12 +62,12 @@ public class SpriteDemo extends JPanel {
 		
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< 50; i++){
-			myMap.getAgents().add(new Loup(myMap));
-		}
-		for(int i=0; i< 50; i++){
-			myMap.getAgents().add(new Mouton(myMap));
-		}
+//		for(int i=0; i< 50; i++){
+//			myMap.getAgents().add(new Loup(myMap));
+//		}
+//		for(int i=0; i< 50; i++){
+//			myMap.getAgents().add(new Mouton(myMap));
+//		}
 		
 	}
 
@@ -89,16 +89,25 @@ public class SpriteDemo extends JPanel {
 				
 				if (myMap.getTerrain()[i][j].isTree){
 					if (myMap.getTerrain()[i][j].type == 0){
-						if(myMap.getTerrain()[i][j].getAFA()==0)
+						//affichage arbre
+						if(myMap.getTerrain()[i][j].getAFA()==0){
 							g2.drawImage(treeSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-						if (myMap.getTerrain()[i][j].getAFA()==1)
+						}
+						//affichage arbre en feu
+						if (myMap.getTerrain()[i][j].getAFA()==1){
 							g2.drawImage(fireSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-						if (myMap.getTerrain()[i][j].getAFA()==2)
-							g2.drawImage(ashesSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+						}
+						
+					}else{
+						//affichage des rochers dans le desert
+						if (myMap.getTerrain()[i][j].type == 1){
+							g2.drawImage(rockSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+						}
 					}
-					else if (myMap.getTerrain()[i][j].type == 1)
-						g2.drawImage(rockSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-					
+				}
+				//affichage cendres
+				if (myMap.getTerrain()[i][j].getAFA()==2){
+					g2.drawImage(ashesSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 				}
 			}
 		}
@@ -134,7 +143,7 @@ public class SpriteDemo extends JPanel {
 
 	public static void main(String[] args) {
 		SpriteDemo monSpriteDemo = new SpriteDemo();
-		for(int i=0; i<1000; i++){
+		while (true){
 			
 			monSpriteDemo.Step();
 //			try {

@@ -30,18 +30,25 @@ public class Map {
 					tree = false;
 					
 				//initialisation du terrain
-				if (x > terrain.length/2 && y > terrain.length/2)
+				if (x > terrain.length/2 && y > terrain.length/2){
 					//cree une case de desert
 					terrain[x][y] = new Terrain(1, 0, 0, tree);
-				else if (x > terrain.length/2 - 2 && y > terrain.length/2 - 2)
-					//cree une transition entre le desert et la foret
-					terrain[x][y] = new Terrain ((int)(Math.random() * 2), 0 ,0 , false);
-				else if (Math.random() < 0.05)
-					//initialisation de la foret avec de l eau
-					terrain[x][y] = new Terrain (2, (int)(Math.random() * 5), 0, false);
-				else
-					//initialisation foret
-					terrain[x][y] = new Terrain(0, 0, 0, tree);
+					
+				}else{
+					if (x > terrain.length/2 - 2 && y > terrain.length/2 - 2){
+						//cree une transition entre le desert et la foret
+						terrain[x][y] = new Terrain ((int)(Math.random() * 2), 0 ,0 , false);
+					}else{ 
+						
+						if (Math.random() < 0.05){
+							//initialisation de la foret avec de l eau
+							terrain[x][y] = new Terrain (2, (int)(Math.random() * 5), 0, false);
+						}else{
+							//initialisation foret
+							terrain[x][y] = new Terrain(0, 0, 0, tree);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -79,17 +86,25 @@ public class Map {
 				//verifie si la case est bien un arbre
 				if(!t[x][y].isTree){
 					//fait pousser un arbre avec chance plus elevee si il y a des cendres
-					if (Math.random()<0.005 ||t[x][y].getAFA()==2 && Math.random() < 0.01)
+					if (Math.random()<0.005 ||(t[x][y].getAFA()==2 && Math.random() < 0.01)){
 						t[x][y].isTree = true;
-				
-					//propagation du feu
-					if (t[(x-1+dx)%dx][y].getAFA() == 1 ||t[(x+1+dx)%dx][y].getAFA() == 1 ||t[x][(y-1+dy)%dy].getAFA() == 1 
-							||t[x][(y+1+dy)%dy].getAFA() == 1 ||Math.random() < 0.00001)
-						t[x][y].setAFA(1);
+						t[x][y].setAFA(0);
+					}
 					
+				}else{
 					//les arbres en feu deviennent des cendres
-					if (t[x][y].getAFA() == 1)
+					if (t[x][y].getAFA() == 1){
 						t[x][y].setAFA(2);
+						t[x][y].isTree = false;
+					}
+					//propagation du feu
+					if (t[x][y].getAFA() == 0 && (t[(x-1+dx)%dx][y].getAFA() == 1 ||t[(x+1+dx)%dx][y].getAFA() == 1 
+							||t[x][(y-1+dy)%dy].getAFA() == 1 ||t[x][(y+1+dy)%dy].getAFA() == 1)){
+						t[x][y].setAFA(1);
+					}
+					
+					if (Math.random() < 0.0001)
+						t[x][y].setAFA(1);
 				}
 			}
 		}
