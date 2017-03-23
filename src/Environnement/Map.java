@@ -2,6 +2,7 @@ package Environnement;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.ListIterator;
 
 import Agent.Agent;
 
@@ -11,7 +12,7 @@ public class Map {
 	private final int dx, dy;
 	protected int water [][];
 	private ArrayList<Agent> agents;
-	
+	public ListIterator<Agent> it;
 	
 	public Map(int dx, int dy) {
 		this.dx = dx;
@@ -62,7 +63,7 @@ public class Map {
 	}
 	
 	public void StepAgent(){
-		for(Iterator<Agent> it = agents.iterator(); it.hasNext(); ){
+		for(it = agents.listIterator(); it.hasNext(); ){
 			Agent a = it.next();
 			if (a.isAlive() && Math.random() < 0.80)
 				a.Step();

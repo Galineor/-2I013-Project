@@ -152,6 +152,10 @@ public abstract class Agent {
 	
 	
 	public boolean isWaterDirection(int d){
+		if(d == -1){
+			return false;
+		}
+		
 		switch(d){
 		case 0:
 			if(world.getTerrain()[posX][(posY - 1 + world.getHeight()) % world.getHeight()].type == 2){

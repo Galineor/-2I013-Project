@@ -62,13 +62,13 @@ public class Mouton extends Prey {
 				return;
 			}
 		}	
-		(world).getAgents().add(new Mouton(world, this.posX, this.posY));
+		(world).it.add(new Mouton(world, this.posX, this.posY));
+		
 	}
 
 	@Override
 	public void Step() {
 		 updatePrevPos();
-		// TODO Auto-generated method stub
 		if ( Math.random() > 0.5 ) // au hasard
 			direction = (direction+1) %4;
 		else
@@ -77,7 +77,6 @@ public class Mouton extends Prey {
 		if(rt == 0){
 			reproduire();
 		}
-		
 		
 		fuite();
 		if(isWaterDirection(direction)){
@@ -117,7 +116,6 @@ public class Mouton extends Prey {
 	 				break;
 			 }
 		}
-		
 		rt--;
 		ht--;
 		

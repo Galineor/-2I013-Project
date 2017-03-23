@@ -7,6 +7,16 @@ public class Loup extends Pred {
 	private boolean isChasing;
 	public final int ageAdulte = 40;
 	public final int ageVieux = 100;
+	public final int deplacement = 20;
+	public final int repos = 5;
+	public final int chasse = 15;
+	
+	private int cptDeplacement;
+	private int cptRepos;
+	private int cptChasse;
+	
+	
+	
 
 	public Loup(Map world) {
 		this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
@@ -25,6 +35,9 @@ public class Loup extends Pred {
 		this.prevPosX = -1;
 		this.prevPosY = -1;
 		this.age = 0;
+		this.cptDeplacement = 0;
+		this.cptRepos = 0;
+		this.cptChasse = 0;
 	}
 	
 	public boolean manger(){
@@ -51,10 +64,13 @@ public class Loup extends Pred {
 				a.setParent(this);
 				a.setPrevPosX(-1);
 				a.setPrevPosY(-1);
+				((Loup)a).cptDeplacement = deplacement;
+				((Loup)a).cptRepos = 0;
+				((Loup)a).cptChasse = 0;
 				return;
 			}
 		}	
-		(world).getAgents().add(new Loup(world, this.posX, this.posY));
+		(world).it.add(new Loup(world, this.posX, this.posY));
 	}
 		
 	public void chasser(){
@@ -80,12 +96,17 @@ public class Loup extends Pred {
 		}
 	}
 	
+	public void deplacementAleatoire(){
+		direction = (int)(Math.random()*4);
+	}
+	
 	
 	@Override
 	public void Step() {
 		 updatePrevPos();
 		//Si le loup a trop faim, il meurt
-		if(ht <= 0){
+		
+		 if(ht <= 0){
 			this.setAlive(false);
 			return;
 		}
@@ -102,7 +123,6 @@ public class Loup extends Pred {
 	
 	@Override
 	public void comportementJeune() {
-		// TODO Auto-generated method stub
 		
 		/* 
 		 * Suit le parent
@@ -110,12 +130,17 @@ public class Loup extends Pred {
 		 * Pas de reproduction
 		 * Endurance forte
 		 */
+		
+		//S'il y a un parent : on le suit
 		if(parent != null && parent.isAlive()){
 			this.setPosX(parent.getPosX());
 			this.setPosY(parent.getPosY());
-		}else{
+		}
+		//Si pas de parents, le louveteau devient adulte
+		else{
 			age = ageAdulte;
 			comportementAdulte();
+			this.cptDeplacement = deplacement;
 		}
 		
 		
@@ -123,7 +148,6 @@ public class Loup extends Pred {
 
 	@Override
 	public void comportementAdulte() {
-		// TODO Auto-generated method stub
 		/*
 		 * Chasse
 		 * Reproduction
@@ -142,12 +166,54 @@ public class Loup extends Pred {
 			reproduire();
 			rt = reprodTime;
 		}
+		
+		//Arbre de comportement
+		if(cptDeplacement > 0){
+			cptDeplacement--;
+			chasser();
+			if(!isChasing){
+				deplacementAleatoire();
+				if(cptDeplacement == 0){
+					cptRepos = repos;
+				}
+			}else{
+				cptChasse = chasse;
+				cptDeplacement = 0;
+			}
+			
+			
+		}else if(cptRepos > 0){
+			cptRepos--;
+			chasser();
+			if(!isChasing){
+				direction = -1;
+				if(cptRepos == 0){
+					cptDeplacement = deplacement;
+				}
+			}else{
+				cptChasse = chasse;
+				cptRepos = 0;
+			}
+		}
+		
+		
+		
+		
+		if(isChasing && cptChasse > 0){
+			cptChasse--;
+		}else if(isChasing && cptChasse == 0){
+			isChasing = false;
+			cptDeplacement = deplacement;
+		}else if(!isChasing && cptChasse > 0){
+			cptChasse = 0;
+			cptDeplacement = deplacement;
+		}
 
 		
 		isChasing = false; //A chaque debut de tour, on ne sait pas si le loup est entrain de chasser
 		chasser();
 		//Permet d'�viter les deplacements avant/arriere en boucle, rendant la simulation plus realiste
-		if(!isChasing && directionPrec>0 && direction == (directionPrec+2)%4){
+		if(!isChasing && direction!=-1 && directionPrec>0 && direction == (directionPrec+2)%4){
 			if ( Math.random() > 0.5 ){ // au hasard
 				for(int i=0; i<3; i++){
 					direction = (direction+1) %4;
@@ -202,6 +268,8 @@ public class Loup extends Pred {
 	         	case 3:	// ouest
 	         		posX = ( posX - 1 + world.getWidth() ) % world.getWidth();
 	 				break;
+	         	case -1:
+	         		break;
 	 			default:
 	 				System.out.println("PROBLEME");
 			 }
@@ -221,7 +289,6 @@ public class Loup extends Pred {
 
 	@Override
 	public void comportementVieux() {
-		// TODO Auto-generated method stub
 		
 		/*
 		 * Moins d'endurance
