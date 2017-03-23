@@ -67,7 +67,7 @@ public class Map {
 			if (a.isAlive() && Math.random() < 0.80)
 				a.Step();
 			else
-				a.updatePrevPos(); // Si on le met pas a jour, on modifie sa position précédente ( permet l'affichage d'agents immobile )
+				a.updatePrevPos(); // Si on le met pas a jour, on modifie sa position precedente ( permet l'affichage d'agents immobile )
 		}
 	}
 	
@@ -81,15 +81,21 @@ public class Map {
 		for(int i = 0; i < (dx*dy)/3 ; i++){
 			x = (int)(Math.random() * dx);
 			y = (int)(Math.random() * dy);
-			
 			if (t[x][y].type == 0){
 				//verifie si la case est bien un arbre
 				if(!t[x][y].isTree){
 					//fait pousser un arbre avec chance plus elevee si il y a des cendres
-					if (Math.random()<0.005 ||(t[x][y].getAFA()==2 && Math.random() < 0.01)){
+					if (t[x][y].getAFA()==2 && Math.random() < 0.1){
 						t[x][y].isTree = true;
 						t[x][y].setAFA(0);
+					}else{
+						if(Math.random()<0.0005 && t[x][y].getAFA() != 2){
+							t[x][y].isTree = true;
+							t[x][y].setAFA(0);
+						}	
 					}
+					if (Math.random() < 0.05 && t[x][y].getAFA() == 2)
+						t[x][y].setAFA(0);
 					
 				}else{
 					//les arbres en feu deviennent des cendres
@@ -103,8 +109,9 @@ public class Map {
 						t[x][y].setAFA(1);
 					}
 					
-					if (Math.random() < 0.0001)
+					if (Math.random() < 0.0001){
 						t[x][y].setAFA(1);
+					}
 				}
 			}
 		}
