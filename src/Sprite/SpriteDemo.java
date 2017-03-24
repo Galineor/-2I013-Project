@@ -32,7 +32,7 @@ public class SpriteDemo extends JPanel {
 	private Image moutonSprite;
 	
 	private int spriteLength = 16;
-	private static int delai = 10;
+	private static int delai = 5;
 	
 	private int tailleX =50, tailleY = 50;
 	private Map myMap;
@@ -60,10 +60,10 @@ public class SpriteDemo extends JPanel {
 		}
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< 10000; i++){
+		for(int i=0; i< 20; i++){
 			myMap.getAgents().add(new Loup(myMap));
 		}
-		for(int i=0; i< 10000; i++){
+		for(int i=0; i< 65; i++){
 			myMap.getAgents().add(new Mouton(myMap));
 		}
 		

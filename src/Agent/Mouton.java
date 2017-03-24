@@ -9,7 +9,7 @@ public class Mouton extends Prey {
 	}
 	
 	public Mouton(Map world, int posx, int posy){
-		super(world, 100, 120);
+		super(world, 100, 90);
 		this.posX = posx;
 		this.posY = posy;
 		this.direction = (int)(Math.random()*4);
