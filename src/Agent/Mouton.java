@@ -9,11 +9,11 @@ public class Mouton extends Prey {
 	}
 	
 	public Mouton(Map world, int posx, int posy){
-		super(world, 100, 110);
+		super(world, 100, 120);
 		this.posX = posx;
 		this.posY = posy;
 		this.direction = (int)(Math.random()*4);
-		this.champDeVision = 2;
+		this.champDeVision = 3;
 		this.ht = hungerTime;
 		this.rt = reprodTime;
 		this.parent=null;
@@ -62,7 +62,7 @@ public class Mouton extends Prey {
 				return;
 			}
 		}	
-		(world).it.add(new Mouton(world, this.posX, this.posY));
+		(world).toAdd.add(new Mouton(world, this.posX, this.posY));
 		
 	}
 
@@ -75,9 +75,9 @@ public class Mouton extends Prey {
 			direction = (direction-1+4) %4;
 		
 		if(rt == 0){
+			rt = reprodTime;
 			reproduire();
 		}
-		
 		fuite();
 		if(isWaterDirection(direction)){
 			if ( Math.random() > 0.5 ){ // au hasard
@@ -117,7 +117,7 @@ public class Mouton extends Prey {
 			 }
 		}
 		rt--;
-		ht--;
+		//ht--;
 		
 	}
 

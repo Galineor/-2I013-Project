@@ -8,6 +8,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.ImageObserver;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.swing.JApplet;
@@ -30,11 +32,13 @@ public class SpriteDemo extends JPanel {
 	private Image moutonSprite;
 	
 	private int spriteLength = 16;
-	private static int delai = 1;
+	private static int delai = 10;
 	
 	private int tailleX =50, tailleY = 50;
 	private Map myMap;
 
+	
+	private ArrayList<Agent> cloneAgent;
 	public SpriteDemo()
 	{
 		try
@@ -56,10 +60,10 @@ public class SpriteDemo extends JPanel {
 		}
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< 20; i++){
+		for(int i=0; i< 10000; i++){
 			myMap.getAgents().add(new Loup(myMap));
 		}
-		for(int i=0; i< 50; i++){
+		for(int i=0; i< 10000; i++){
 			myMap.getAgents().add(new Mouton(myMap));
 		}
 		
@@ -112,7 +116,9 @@ public class SpriteDemo extends JPanel {
 			}
 		}
 		
-		for(Agent a : myMap.getAgents()){
+		//Clone pour eviter les ConcurrentModificationException...
+		cloneAgent = new ArrayList<Agent>(myMap.getAgents());
+		for(Agent a : cloneAgent){
 			if(a.isAlive()){
 				if(a instanceof Loup){
 					g2.drawImage(loupSprite,a.getSpritePosX(),a.getSpritePosY(),spriteLength,spriteLength, frame);
@@ -135,9 +141,7 @@ public class SpriteDemo extends JPanel {
 			repaint();
 			try {
 				Thread.sleep(delai);
-			} catch (InterruptedException e) 
-			{
-			}
+			} catch (InterruptedException e) {}
 		}
 	}
 

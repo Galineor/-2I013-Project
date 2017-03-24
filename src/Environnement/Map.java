@@ -12,7 +12,7 @@ public class Map {
 	private final int dx, dy;
 	protected int water [][];
 	private ArrayList<Agent> agents;
-	public ListIterator<Agent> it;
+	public ArrayList<Agent> toAdd = new ArrayList<Agent>();
 	
 	public Map(int dx, int dy) {
 		this.dx = dx;
@@ -63,13 +63,15 @@ public class Map {
 	}
 	
 	public void StepAgent(){
-		for(it = agents.listIterator(); it.hasNext(); ){
-			Agent a = it.next();
+		for(Agent a : getAgents()){
 			if (a.isAlive() && Math.random() < 0.80)
 				a.Step();
 			else
 				a.updatePrevPos(); // Si on le met pas a jour, on modifie sa position precedente ( permet l'affichage d'agents immobile )
 		}
+		
+		agents.addAll(toAdd);
+		toAdd.clear();
 	}
 	
 	public void StepWorld(){

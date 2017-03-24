@@ -1,5 +1,7 @@
 package Agent;
 
+import java.util.Iterator;
+
 import Environnement.*;
 
 public class Loup extends Pred {
@@ -23,7 +25,7 @@ public class Loup extends Pred {
 	}
 	
 	public Loup(Map world, int x, int y) {
-		super(world, 100, 150);
+		super(world, 100, 180);
 		this.posX = x;
 		this.posY = y;
 		this.direction = (int)(Math.random()*4);
@@ -70,11 +72,11 @@ public class Loup extends Pred {
 				return;
 			}
 		}	
-		(world).it.add(new Loup(world, this.posX, this.posY));
+		(world).toAdd.add(new Loup(world, this.posX, this.posY));
 	}
 		
 	public void chasser(){
-		for (Agent a : world.getAgents()){
+		for(Agent a : world.getAgents()){
 			if(!a.isPred && a.isAlive()){
 				if(a.posY >= this.posY - 4 && a.posY<=this.posY && a.posX == this.posX){
 					this.direction = 0;
