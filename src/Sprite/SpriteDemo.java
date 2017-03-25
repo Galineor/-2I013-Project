@@ -20,7 +20,7 @@ public class SpriteDemo extends JPanel {
 
 
 	private JFrame frame;
-	
+
 	private Image waterSprite;
 	private Image grassSprite;
 	private Image desertSprite;
@@ -31,8 +31,11 @@ public class SpriteDemo extends JPanel {
 	private Image loupSprite;
 	private Image moutonSprite;
 	
-	private int spriteLength = 16;
-	private static int delai = 5;
+	public static int spriteLength = 16;
+	private static int delai = 1;
+	
+	private int NbDepartLoup = 20;
+	private int NbDepartMouton = 65;
 	
 	private int tailleX =50, tailleY = 50;
 	private Map myMap;
@@ -43,6 +46,7 @@ public class SpriteDemo extends JPanel {
 	{
 		try
 		{
+			//TODO Gestion des sprites dans les classes pour essayer d'avoir des sprites qui "evoluent"
 			waterSprite = ImageIO.read(new File("src/water.png"));
 			treeSprite = ImageIO.read(new File("src/tree.png"));
 			fireSprite = ImageIO.read(new File("src/tree_fire.png"));
@@ -60,16 +64,16 @@ public class SpriteDemo extends JPanel {
 		}
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< 20; i++){
+		for(int i=0; i< NbDepartLoup; i++){
 			myMap.getAgents().add(new Loup(myMap));
 		}
-		for(int i=0; i< 65; i++){
+		for(int i=0; i< NbDepartMouton; i++){
 			myMap.getAgents().add(new Mouton(myMap));
 		}
 		
 		frame = new JFrame("World of Sprite");
 		frame.add(this);
-		frame.setSize(tailleX*spriteLength, tailleY*spriteLength+40);
+		frame.setSize(tailleX*spriteLength+16, tailleY*spriteLength+40);
 		frame.setVisible(true);
 		
 		
@@ -131,7 +135,6 @@ public class SpriteDemo extends JPanel {
 	
 	public void Step(){
 		myMap.Step();
-		repaint();
 		for(int i=0; i<=spriteLength; i++){
 			for(Agent a : myMap.getAgents()){
 				if(a.isAlive()){
