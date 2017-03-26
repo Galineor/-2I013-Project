@@ -11,6 +11,7 @@ public class Groupe<T extends Agent> {
 	public Groupe(T leader){
 		this.leader = leader;
 		this.groupe = new ArrayList<T>();
+		this.add(leader);
 	}
 	
 	public void add(T member){

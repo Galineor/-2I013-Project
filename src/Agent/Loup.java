@@ -16,6 +16,10 @@ public class Loup extends Pred {
 	private int cptDeplacement;
 	private int cptRepos;
 	private int cptChasse;
+	
+	protected Groupe<Loup> pack;
+	
+	
 
 	public Loup(Map world) {
 		this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
@@ -41,6 +45,8 @@ public class Loup extends Pred {
 		((Loup)a).cptDeplacement = deplacement;
 		((Loup)a).cptRepos = 0;
 		((Loup)a).cptChasse = 0;
+		((Loup)a).pack = null;
+		a.belongPack = false;
 	}
 
 	public void reproduire(){
@@ -77,6 +83,21 @@ public class Loup extends Pred {
 			}
 		}
 	}
+	
+	public void mourir(){
+		this.setAlive(false);
+		if(this.belongPack){
+			//On supprime les agents qui meurent de la meute
+			this.pack.groupe.remove(this);
+			if(this.pack.groupe.size() == 1){
+				this.pack.groupe.get(0).belongPack = false;
+				this.pack.groupe.get(0).pack = null;
+				return;
+			}
+			this.pack.updateLeader();
+			
+		}
+	}
 
 
 	@Override
@@ -85,7 +106,7 @@ public class Loup extends Pred {
 		//Si le loup a trop faim, il meurt
 
 		if(ht <= 0){
-			this.setAlive(false);
+			this.mourir();
 			return;
 		}
 		if(age<40){
@@ -121,6 +142,38 @@ public class Loup extends Pred {
 
 
 	}
+	
+	public void gestionPack(){
+		for(Agent a : world.getAgents()){
+			if(a instanceof Loup && a.isAlive && !a.equals(this)){
+				//Si un autre Loup se trouve a proximite
+				if(a.getPosX() >= this.posX - 2 && a.getPosX() <= this.posX + 2 &&
+						a.getPosY() >= this.posY - 2 && a.getPosY() <= this.posY + 2){
+					if(!this.belongPack){
+						if(a.belongPack){
+							this.pack = ((Loup)a).pack;
+							this.belongPack = true;
+						}else if(!a.belongPack){
+							this.pack = new Groupe<Loup>(this);
+							this.pack.add((Loup)a);
+							this.belongPack = true;
+							((Loup)a).pack = this.pack;
+							a.belongPack = true;
+						}
+					}
+					//Si il y a 2 petites meutes a proximite, elles fusionnent
+					else if(this.belongPack && a.belongPack && this.pack != ((Loup)a).pack){
+						if(this.pack.groupe.size() + ((Loup)a).pack.groupe.size() < 10){
+							for(Loup l : this.pack.groupe){
+								l.pack = ((Loup)a).pack;
+								((Loup)a).pack.add(l);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
 	@Override
 	public void comportementAdulte() {
@@ -138,46 +191,63 @@ public class Loup extends Pred {
 		if(rt == 0){
 			reproduire();
 		}
-
-		//Arbre de comportement
-		if(cptDeplacement > 0){
-			cptDeplacement--;
-			chasser();
-			if(!isChasing){
-				deplacementAleatoire();
-				if(cptDeplacement == 0){
-					cptRepos = repos;
+		
+		gestionPack();
+		
+		if(!belongPack || (this.belongPack && this.pack.leader == this)){
+			//On verifie si on peut creer une meute
+			
+			//Si on n'appatient pas a une meute, on regarde si on peut en creer une
+			
+			
+			//Arbre de comportement
+			if(cptDeplacement > 0){
+				cptDeplacement--;
+				chasser();
+				if(!isChasing){
+					deplacementAleatoire();
+					if(cptDeplacement == 0){
+						cptRepos = repos;
+					}
+				}else{
+					cptChasse = chasse;
+					cptDeplacement = 0;
 				}
-			}else{
-				cptChasse = chasse;
-				cptDeplacement = 0;
+			}else if(cptRepos > 0){
+				cptRepos--;
+				chasser();
+				if(!isChasing){
+					direction = -1;
+					if(cptRepos == 0){
+						cptDeplacement = deplacement;
+					}
+				}else{
+					cptChasse = chasse;
+					cptRepos = 0;
+				}
 			}
-		}else if(cptRepos > 0){
-			cptRepos--;
+			if(isChasing && cptChasse > 0){
+				cptChasse--;
+			}else if(isChasing && cptChasse == 0){
+				isChasing = false;
+				cptDeplacement = deplacement;
+			}else if(!isChasing && cptChasse > 0){
+				cptChasse = 0;
+				cptDeplacement = deplacement;
+			}
+			
 			chasser();
-			if(!isChasing){
-				direction = -1;
-				if(cptRepos == 0){
-					cptDeplacement = deplacement;
-				}
-			}else{
-				cptChasse = chasse;
-				cptRepos = 0;
+			correctDirection(); //Permet de corriger la direction si le deplacement n'est pas possible dans la direction actuelle
+			move(direction, 1);
+		}
+		else if(belongPack){
+			if(distanceFrom(this.pack.leader) > 2){
+				moveToward(this.pack.leader);
 			}
 		}
-		if(isChasing && cptChasse > 0){
-			cptChasse--;
-		}else if(isChasing && cptChasse == 0){
-			isChasing = false;
-			cptDeplacement = deplacement;
-		}else if(!isChasing && cptChasse > 0){
-			cptChasse = 0;
-			cptDeplacement = deplacement;
-		}
-
-		chasser();
-		correctDirection(); //Permet de corriger la direction si le deplacement n'est pas possible dans la direction actuelle
-		move(direction, 1);		
+		
+		
+				
 
 		//On essaie de manger apres le deplacemnt
 		manger();

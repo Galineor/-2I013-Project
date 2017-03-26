@@ -97,6 +97,10 @@ public abstract class Agent {
 		}
 	}
 	
+	public double distanceFrom(Agent a){
+		return Math.sqrt(Math.pow(this.posX - a.posX, 2) + Math.pow(this.posY - a.posY, 2));
+	}
+	
 	public void deplacementAleatoire(){
 		//Si pas de direction, on en choisie une aleatoire
 		if(direction == -1){
@@ -142,7 +146,7 @@ public abstract class Agent {
 		}else if(a.posY > this.posY){
 			direction = 2;
 		}else if(a.posY < this.posY){
-			direction = 3;
+			direction = 0;
 		}else{
 			direction = -1;
 		}
@@ -207,6 +211,8 @@ public abstract class Agent {
 		
 		return false;
 	}
+	
+	public abstract void mourir();
 
 	public int getPrevPosX() {
 		return prevPosX;

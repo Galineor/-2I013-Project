@@ -63,6 +63,10 @@ public class Mouton extends Prey {
 		(world).toAdd.add(new Mouton(world, this.posX, this.posY));
 		
 	}
+	
+	public void mourir(){
+		this.setAlive(false);
+	}
 
 	@Override
 	public void Step() {
