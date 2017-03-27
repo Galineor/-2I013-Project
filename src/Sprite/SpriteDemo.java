@@ -31,6 +31,7 @@ public class SpriteDemo extends JPanel {
 	private Image loupSprite;
 	private Image moutonSprite;
 	private Image lavaSprite;
+	private Image obsiSprite;
 	
 	public static int spriteLength = 16;
 	private static int delai = 1;
@@ -43,10 +44,8 @@ public class SpriteDemo extends JPanel {
 
 	
 	private ArrayList<Agent> cloneAgent;
-	public SpriteDemo()
-	{
-		try
-		{
+	public SpriteDemo(){
+		try{
 			//TODO Gestion des sprites dans les classes pour essayer d'avoir des sprites qui "evoluent"
 			waterSprite = ImageIO.read(new File("src/water.png"));
 			treeSprite = ImageIO.read(new File("src/tree.png"));
@@ -58,9 +57,9 @@ public class SpriteDemo extends JPanel {
 			loupSprite = ImageIO.read(new File("src/wolf.png"));
 			moutonSprite = ImageIO.read(new File("src/sheep.png"));
 			lavaSprite = ImageIO.read(new File ("src/Lava.png"));
+			obsiSprite = ImageIO.read(new File ("src/obsidienne.png"));
 		}
-		catch(Exception e)
-		{
+		catch(Exception e){
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -98,6 +97,8 @@ public class SpriteDemo extends JPanel {
 					g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 				}else if(myMap.getTerrain()[i][j].type == 4){
 					g2.drawImage(lavaSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+				}else if(myMap.getTerrain()[i][j].type == 5){
+					g2.drawImage(obsiSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
 				}
 				
 				if (myMap.getTerrain()[i][j].isTree){
