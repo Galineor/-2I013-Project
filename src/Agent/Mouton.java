@@ -5,11 +5,31 @@ import Environnement.*;
 public class Mouton extends Prey {
 
 	public Mouton(Map world) {
-		this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
+		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
+		super(world, 200, 125);
+		int x = -1 ,y = -1;
+		boolean goodPlacement = false;
+		
+		//Tant qu'il y a de l'eau sur le spawn ou de l'eau qui va se propager a proximite, on change de spawn
+		while(!goodPlacement){
+			x = (int)(Math.random()*world.getWidth());
+			y = (int)(Math.random()*world.getHeight());
+			
+			goodPlacement = true;
+			
+			// S'il y a de l'eau a proximite, on considere que c'est une mauvaise position de spawn
+			if(world.getTerrain()[x][y].type == 2 || world.getTerrain()[x+1][y].type == 2 || world.getTerrain()[x-1][y].type == 2 ||
+					world.getTerrain()[x][y+1].type == 2|| world.getTerrain()[x][y-1].type == 2 ){
+				goodPlacement = false;
+			}
+			
+		}
+		initAttributes(this, x, y, null);
+		
 	}
 	
 	public Mouton(Map world, int x, int y){
-		super(world, 100, 125);
+		super(world, 200, 125);
 		initAttributes(this, x, y, null);
 	}
 	
@@ -60,7 +80,7 @@ public class Mouton extends Prey {
 				return;
 			}
 		}	
-		(world).toAdd.add(new Mouton(world, this.posX, this.posY));
+		world.toAdd.add(new Mouton(world, this.posX, this.posY));
 		
 	}
 	
@@ -76,11 +96,16 @@ public class Mouton extends Prey {
 		if(rt == 0){
 			reproduire();
 		}
+		
+		if(ht == 0){
+			this.setAlive(false);
+			return;
+		}
 		fuite(); //Fuis si besoin
 		correctDirection();		
 		move(direction, 1);
 		rt--;
-		//ht--;
+		ht--;
 		
 	}
 

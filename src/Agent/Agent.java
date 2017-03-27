@@ -29,30 +29,6 @@ public abstract class Agent {
 	protected int hungerTime;
 	protected int ht, rt; //Compteur de faim et de reproduction
 
-	public Agent getParent() {
-		return parent;
-	}
-
-	public void setParent(Agent parent) {
-		this.parent = parent;
-	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-	
-	public int getSpritePosX() {
-		return spritePosX;
-	}
-
-	public int getSpritePosY() {
-		return spritePosY;
-	}
-
 	public Agent(Map world){
 		this.direction = 0;
 		this.isAlive = true;
@@ -293,6 +269,30 @@ public abstract class Agent {
 
 	public void setRt(int rt) {
 		this.rt = rt;
+	}
+	
+	public Agent getParent() {
+		return parent;
+	}
+
+	public void setParent(Agent parent) {
+		this.parent = parent;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+	
+	public int getSpritePosX() {
+		return spritePosX;
+	}
+
+	public int getSpritePosY() {
+		return spritePosY;
 	}
 
 	public abstract void comportementJeune();

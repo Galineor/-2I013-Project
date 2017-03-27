@@ -1,7 +1,5 @@
 package Agent;
 
-import java.util.Iterator;
-
 import Environnement.*;
 
 public class Loup extends Pred {
@@ -22,7 +20,17 @@ public class Loup extends Pred {
 	
 
 	public Loup(Map world) {
-		this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
+		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
+		super(world, 200, 125);
+		int x = (int)(Math.random()*world.getWidth());
+		int y = (int)(Math.random()*world.getHeight());
+		
+		//Tant qu'il y a de l'eau sur le spawn, on change de spawn
+		while(world.getTerrain()[x][y].type == 2){
+			x = (int)(Math.random()*world.getWidth());
+			y = (int)(Math.random()*world.getHeight());
+		}
+		initAttributes(this, x, y, null);
 	}
 
 	public Loup(Map world, int x, int y) {
@@ -57,7 +65,7 @@ public class Loup extends Pred {
 				return;
 			}
 		}	
-		(world).toAdd.add(new Loup(world, this.posX, this.posY));
+		world.toAdd.add(new Loup(world, this.posX, this.posY));
 	}
 
 	public void chasser(){
