@@ -14,6 +14,8 @@ public class Map {
 	private ArrayList<Agent> agents;
 	public ArrayList<Agent> toAdd = new ArrayList<Agent>();
 	
+	private final static double OCEAN = 0.3;
+	
 	public Map(int dx, int dy) {
 		this.dx = dx;
 		this.dy = dy;
@@ -31,22 +33,27 @@ public class Map {
 					tree = false;
 					
 				//initialisation du terrain
-				if (x > terrain.length/2 && y > terrain.length/2){
-					//cree une case de desert
-					terrain[x][y] = new Terrain(1, 0, 0, tree);
-					
+				if(Math.random()<(1-(x*OCEAN)) ||Math.random()<(1-(y*OCEAN))
+						||Math.random()<(1-((dx-x-1)*OCEAN)) ||Math.random()<(1-((dy-y-1)*OCEAN))){
+						//ajout de la mer autour de l ile
+						terrain[x][y] = new Terrain (2, 2, 0, false);
 				}else{
-					if (x > terrain.length/2 - 2 && y > terrain.length/2 - 2){
-						//cree une transition entre le desert et la foret
-						terrain[x][y] = new Terrain ((int)(Math.random() * 2), 0 ,0 , false);
-					}else{ 
-						
-						if (Math.random() < 0.05){
-							//initialisation de la foret avec de l eau
-							terrain[x][y] = new Terrain (2, (int)(Math.random() * 5), 0, false);
+					if (x > terrain.length/2 && y > terrain.length/2){
+						//cree une case de desert
+						terrain[x][y] = new Terrain(1, 0, 0, tree);
+					
+					}else{
+						if (x > terrain.length/2 - 2 && y > terrain.length/2 - 2){
+							//cree une transition entre le desert et la foret
+							terrain[x][y] = new Terrain ((int)(Math.random() * 2), 0 ,0 , false);
 						}else{
-							//initialisation foret
-							terrain[x][y] = new Terrain(0, 0, 0, tree);
+							if (Math.random() < 0.01){
+								//initialisation de la foret avec de l eau
+								terrain[x][y] = new Terrain (2, (int)(Math.random() * 5), 0, false);
+							}else{
+								//initialisation foret
+								terrain[x][y] = new Terrain(0, 0, 0, tree);
+							}
 						}
 					}
 				}
@@ -54,9 +61,6 @@ public class Map {
 		}
 	}
 
-	
-	//creer un deuxieme constructeur qui prends un nuage de point pour creer la map
-	
 	public void Step (){
 		StepWorld();
 		StepAgent();

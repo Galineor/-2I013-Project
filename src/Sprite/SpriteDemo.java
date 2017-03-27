@@ -32,12 +32,12 @@ public class SpriteDemo extends JPanel {
 	private Image moutonSprite;
 	
 	public static int spriteLength = 16;
-	private static int delai = 1;
+	private static int delai = 0;
 	
 	private int NbDepartLoup = 20;
 	private int NbDepartMouton = 65;
 	
-	private int tailleX =50, tailleY = 50;
+	private int tailleX =40, tailleY = 40;
 	private Map myMap;
 
 	
@@ -64,12 +64,12 @@ public class SpriteDemo extends JPanel {
 		}
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< NbDepartLoup; i++){
-			myMap.getAgents().add(new Loup(myMap));
-		}
-		for(int i=0; i< NbDepartMouton; i++){
-			myMap.getAgents().add(new Mouton(myMap));
-		}
+//		for(int i=0; i< NbDepartLoup; i++){
+//			myMap.getAgents().add(new Loup(myMap));
+//		}
+//		for(int i=0; i< NbDepartMouton; i++){
+//			myMap.getAgents().add(new Mouton(myMap));
+//		}
 		
 		frame = new JFrame("World of Sprite");
 		frame.add(this);
