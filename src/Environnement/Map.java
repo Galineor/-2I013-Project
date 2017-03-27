@@ -80,7 +80,7 @@ public class Map {
 	public void StepWorld(){
 		majForet(terrain);
 		majEau();
-		if (Math.random() < 1)
+		if (Math.random() < 0.001 && terrain[dx/2][dy/2].type != 4)
 			Volcan (terrain);
 		majLAVA();
 	}
@@ -168,7 +168,7 @@ public class Map {
 	
 	public void Volcan (Terrain[][] t){
 		t[dx/2][dy/2].type = 4; //met de la lave au niveau du volcan
-		t[dx/2][dy/2].water =20;
+		t[dx/2][dy/2].water =(int)(Math.random() * 30);
 		t[dx/2][dy/2].cptLAVA = 5;
 	}
 	
@@ -178,29 +178,42 @@ public class Map {
 			for (int j = 0; j < dy/3; j++){
 				x = (int)(Math.random() * dx);
 				y = (int)(Math.random() * dy);
-				if (terrain[(x - 1 + dx)% dx][y].water > terrain[x][y].water && terrain[(x - 1 + dx)% dx][y].water > 1
+				
+				if (terrain[x][y].cptLAVA == 0){
+					terrain[x][y].cptLAVA = -1;
+					terrain[x][y].type = 5;
+					terrain[x][y].water = 0;
+					
+				}else if (terrain[(x - 1 + dx)% dx][y].water > terrain[x][y].water && terrain[(x - 1 + dx)% dx][y].water > 1
 						&& terrain[(x - 1 + dx)% dx][y].type == 4){
 					terrain[x][y].water ++;
 					terrain[(x - 1 + dx)% dx][y].water --;
 					terrain[x][y].type = 4;
+					terrain[x][y].cptLAVA = 5;
 					
-				}if (terrain[(x + 1)% dx][y].water > terrain[x][y].water && terrain[(x + 1)% dx][y].water > 1
+				}else if (terrain[(x + 1)% dx][y].water > terrain[x][y].water && terrain[(x + 1)% dx][y].water > 1
 						&& terrain[(x + 1)% dx][y].type == 4){
 					terrain[x][y].water ++;
 					terrain[(x + 1)% dx][y].water --;
 					terrain[x][y].type = 4;
+					terrain[x][y].cptLAVA = 5;
 					
-				}if(terrain[x][(y - 1 + dy)% dy].water > terrain[x][y].water && terrain[x][(y - 1 + dx)% dx].water > 1
+				}else if(terrain[x][(y - 1 + dy)% dy].water > terrain[x][y].water && terrain[x][(y - 1 + dx)% dx].water > 1
 						&& terrain[x][(y - 1 + dx)% dx].type == 4){
 					terrain[x][y].water ++;
 					terrain[x][(y - 1 + dy)% dy].water --;
 					terrain[x][y].type = 4;
+					terrain[x][y].cptLAVA = 5;
 				
-				}if(terrain[x][(y + 1)% dy].water > terrain[x][y].water && terrain[x][(y + 1)% dy].water > 1
+				}else if(terrain[x][(y + 1)% dy].water > terrain[x][y].water && terrain[x][(y + 1)% dy].water > 1
 						&& terrain[x][(y + 1)% dy].type == 4){
 					terrain[x][y].water ++;
 					terrain[x][(y + 1)% dy].water --;
 					terrain[x][y].type = 4;
+					terrain[x][y].cptLAVA = 5;
+				}
+				if (terrain[x][y].cptLAVA > 0){
+					terrain[x][y].cptLAVA --;
 				}
 			}
 		}
