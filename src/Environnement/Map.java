@@ -10,7 +10,6 @@ public class Map {
 	
 	private Terrain[][] terrain;
 	private final int dx, dy;
-	protected int water [][];
 	private ArrayList<Agent> agents;
 	public ArrayList<Agent> toAdd = new ArrayList<Agent>();
 	
@@ -80,7 +79,10 @@ public class Map {
 	
 	public void StepWorld(){
 		majForet(terrain);
-		majEau(terrain);
+		majEau();
+		if (Math.random() < 1)
+			Volcan (terrain);
+		majLAVA();
 	}
 	
 	public void majForet (Terrain[][] t){
@@ -124,30 +126,81 @@ public class Map {
 		}
 	}
 	
-	public void majEau (Terrain[][] t){
-		for(int x = 0; x < dx; x++){
-			for (int y = 0; y < dy; y++){
-				if (!t[x][y].isTree){
-					if (t[(x - 1 + dx)% dx][y].water > t[x][y].water && t[(x - 1 + dx)% dx][y].water > 1){
-						t[x][y].water ++;
-						t[(x - 1 + dx)% dx][y].water --;
-						t[x][y].type = 2;
+	public void majEau (){
+		int x, y;
+		for(int i = 0; i < dx/3; i++){
+			for (int j = 0; j < dy/3; j++){
+				x = (int)(Math.random() * dx);
+				y = (int)(Math.random() * dy);
+				if (!terrain[x][y].isTree){
+					if (terrain[(x - 1 + dx)% dx][y].water > terrain[x][y].water && terrain[(x - 1 + dx)% dx][y].water > 1
+							&& terrain[(x - 1 + dx)% dx][y].type == 2){
+						terrain[x][y].water ++;
+						terrain[(x - 1 + dx)% dx][y].water --;
+						terrain[x][y].type = 2;
+						terrain[x][y].isTree = false;
 						
-					}if (t[(x + 1)% dx][y].water > t[x][y].water && t[(x + 1)% dx][y].water > 1){
-						t[x][y].water ++;
-						t[(x + 1)% dx][y].water --;
-						t[x][y].type = 2;
+					}if (terrain[(x + 1)% dx][y].water > terrain[x][y].water && terrain[(x + 1)% dx][y].water > 1
+							&& terrain[(x + 1)% dx][y].type == 2){
+						terrain[x][y].water ++;
+						terrain[(x + 1)% dx][y].water --;
+						terrain[x][y].type = 2;
+						terrain[x][y].isTree = false;
 						
-					}if(t[x][(y - 1 + dy)% dy].water > t[x][y].water && t[x][(y - 1 + dx)% dx].water > 1){
-						t[x][y].water ++;
-						t[x][(y - 1 + dy)% dy].water --;
-						t[x][y].type = 2;
+					}if(terrain[x][(y - 1 + dy)% dy].water > terrain[x][y].water && terrain[x][(y - 1 + dx)% dx].water > 1
+							&& terrain[x][(y - 1 + dx)% dx].type == 2){
+						terrain[x][y].water ++;
+						terrain[x][(y - 1 + dy)% dy].water --;
+						terrain[x][y].type = 2;
+						terrain[x][y].isTree = false;
 					
-					}if(t[x][(y + 1)% dy].water > t[x][y].water && t[x][(y + 1)% dy].water > 1){
-						t[x][y].water ++;
-						t[x][(y + 1)% dy].water --;
-						t[x][y].type = 2;
+					}if(terrain[x][(y + 1)% dy].water > terrain[x][y].water && terrain[x][(y + 1)% dy].water > 1
+							&& terrain[x][(y + 1)% dy].type == 2){
+						terrain[x][y].water ++;
+						terrain[x][(y + 1)% dy].water --;
+						terrain[x][y].type = 2;
+						terrain[x][y].isTree = false;
 					}
+				}
+			}
+		}
+	}
+	
+	public void Volcan (Terrain[][] t){
+		t[dx/2][dy/2].type = 4; //met de la lave au niveau du volcan
+		t[dx/2][dy/2].water =20;
+		t[dx/2][dy/2].cptLAVA = 5;
+	}
+	
+	public void majLAVA (){
+		int x, y;
+		for(int i = 0; i < dx/3; i++){
+			for (int j = 0; j < dy/3; j++){
+				x = (int)(Math.random() * dx);
+				y = (int)(Math.random() * dy);
+				if (terrain[(x - 1 + dx)% dx][y].water > terrain[x][y].water && terrain[(x - 1 + dx)% dx][y].water > 1
+						&& terrain[(x - 1 + dx)% dx][y].type == 4){
+					terrain[x][y].water ++;
+					terrain[(x - 1 + dx)% dx][y].water --;
+					terrain[x][y].type = 4;
+					
+				}if (terrain[(x + 1)% dx][y].water > terrain[x][y].water && terrain[(x + 1)% dx][y].water > 1
+						&& terrain[(x + 1)% dx][y].type == 4){
+					terrain[x][y].water ++;
+					terrain[(x + 1)% dx][y].water --;
+					terrain[x][y].type = 4;
+					
+				}if(terrain[x][(y - 1 + dy)% dy].water > terrain[x][y].water && terrain[x][(y - 1 + dx)% dx].water > 1
+						&& terrain[x][(y - 1 + dx)% dx].type == 4){
+					terrain[x][y].water ++;
+					terrain[x][(y - 1 + dy)% dy].water --;
+					terrain[x][y].type = 4;
+				
+				}if(terrain[x][(y + 1)% dy].water > terrain[x][y].water && terrain[x][(y + 1)% dy].water > 1
+						&& terrain[x][(y + 1)% dy].type == 4){
+					terrain[x][y].water ++;
+					terrain[x][(y + 1)% dy].water --;
+					terrain[x][y].type = 4;
 				}
 			}
 		}
@@ -155,10 +208,6 @@ public class Map {
 	
 	public Terrain[][] getTerrain(){
 		return this.terrain;
-	}
-	
-	public int[][] getWater(){
-		return this.water;
 	}
 	
 	public int getHeight(){

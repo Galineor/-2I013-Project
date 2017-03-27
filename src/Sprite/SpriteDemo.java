@@ -30,9 +30,10 @@ public class SpriteDemo extends JPanel {
 	private Image rockSprite;
 	private Image loupSprite;
 	private Image moutonSprite;
+	private Image lavaSprite;
 	
 	public static int spriteLength = 16;
-	private static int delai = 0;
+	private static int delai = 1;
 	
 	private int NbDepartLoup = 20;
 	private int NbDepartMouton = 65;
@@ -56,6 +57,7 @@ public class SpriteDemo extends JPanel {
 			desertSprite = ImageIO.read(new File("src/desert.png"));
 			loupSprite = ImageIO.read(new File("src/wolf.png"));
 			moutonSprite = ImageIO.read(new File("src/sheep.png"));
+			lavaSprite = ImageIO.read(new File ("src/Lava.png"));
 		}
 		catch(Exception e)
 		{
@@ -91,9 +93,12 @@ public class SpriteDemo extends JPanel {
 				}else if(myMap.getTerrain()[i][j].type == 1){
 					//affiche desert
 					g2.drawImage(desertSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
-				}else if(myMap.getTerrain()[i][j].type == 2)
+				}else if(myMap.getTerrain()[i][j].type == 2){
 					//affiche l eau
 					g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+				}else if(myMap.getTerrain()[i][j].type == 4){
+					g2.drawImage(lavaSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+				}
 				
 				if (myMap.getTerrain()[i][j].isTree){
 					if (myMap.getTerrain()[i][j].type == 0){
