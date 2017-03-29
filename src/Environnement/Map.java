@@ -87,12 +87,16 @@ public class Map {
 	
 	public void majForet (Terrain[][] t){
 		int x, y;
-		for(int i = 0; i < (dx*dy)/3 ; i++){
+		for(int i = 0; i < (dx*dy)/4 ; i++){
 			x = (int)(Math.random() * dx);
 			y = (int)(Math.random() * dy);
 			if (t[x][y].type == 0){
 				//verifie si la case est bien un arbre
 				if(!t[x][y].isTree){
+					
+					if (Math.random() < 0.05 && t[x][y].getAFA() == 2)
+						t[x][y].setAFA(0);
+					
 					//fait pousser un arbre avec chance plus elevee si il y a des cendres
 					if (t[x][y].getAFA()==2 && Math.random() < 0.1){
 						t[x][y].isTree = true;
@@ -103,18 +107,28 @@ public class Map {
 							t[x][y].setAFA(0);
 						}	
 					}
-					if (Math.random() < 0.05 && t[x][y].getAFA() == 2)
-						t[x][y].setAFA(0);
 					
 				}else{
-					//les arbres en feu deviennent des cendres
 					if (t[x][y].getAFA() == 1){
-						t[x][y].setAFA(2);
-						t[x][y].isTree = false;
+						//les arbres en feu disparraissent si près de lave
+						if (t[(x-1+dx)%dx][y].type == 4 ||t[(x+1+dx)%dx][y].type == 4
+								||t[x][(y-1+dy)%dy].type == 4 ||t[x][(y+1+dy)%dy].type == 4){
+							t[x][y].setAFA(0);
+							t[x][y].isTree = false;
+						}else{
+							//les arbres en feu deviennent des cendres
+							t[x][y].setAFA(2);
+							t[x][y].isTree = false;
+						}
 					}
 					//propagation du feu
 					if (t[x][y].getAFA() == 0 && (t[(x-1+dx)%dx][y].getAFA() == 1 ||t[(x+1+dx)%dx][y].getAFA() == 1 
 							||t[x][(y-1+dy)%dy].getAFA() == 1 ||t[x][(y+1+dy)%dy].getAFA() == 1)){
+						t[x][y].setAFA(1);
+					}
+					
+					if (t[x][y].getAFA() == 0 && (t[(x-1+dx)%dx][y].type == 4 ||t[(x+1+dx)%dx][y].type == 4
+							||t[x][(y-1+dy)%dy].type == 4 ||t[x][(y+1+dy)%dy].type == 4)){
 						t[x][y].setAFA(1);
 					}
 					
@@ -132,7 +146,7 @@ public class Map {
 			for (int j = 0; j < dy/3; j++){
 				x = (int)(Math.random() * dx);
 				y = (int)(Math.random() * dy);
-				if (!terrain[x][y].isTree){
+				if (!terrain[x][y].isTree && terrain[x][y].getAFA() != 2){
 					if (terrain[(x - 1 + dx)% dx][y].water > terrain[x][y].water && terrain[(x - 1 + dx)% dx][y].water > 1
 							&& terrain[(x - 1 + dx)% dx][y].type == 2){
 						terrain[x][y].water ++;
