@@ -1,12 +1,22 @@
 package Agent;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+
 import Environnement.*;
+import Sprite.SpriteDemo;
 
 public class Mouton extends Prey {
-
+	private Image moutonSprite;
+	
+	
 	public Mouton(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
-		super(world, 200, 125);
+		super(world, 125, 200);
 		int x = -1 ,y = -1;
 		boolean goodPlacement = false;
 		
@@ -26,11 +36,18 @@ public class Mouton extends Prey {
 		}
 		initAttributes(this, x, y, null);
 		
+		try{
+			moutonSprite = ImageIO.read(new File("src/sheep.png"));
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public Mouton(Map world, int x, int y){
-		super(world, 200, 125);
-		initAttributes(this, x, y, null);
+		this(world);
+		this.setPosX(x);
+		this.setPosY(y);
 	}
 	
 	public void initAttributes(Agent a, int x, int y, Agent parent){
@@ -47,29 +64,33 @@ public class Mouton extends Prey {
 		a.setPrevPosY(-1);
 	}
 	
+	public void afficher(Graphics2D g2, JFrame frame){
+		g2.drawImage(moutonSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+	}
+	
 	//Regarde les alentours de la proie et engage la fuite de la proe vers une zone (peut etre) safe
 	public void fuite(){
-//		for(Agent a: world.getAgents()){
-//			if(a.isPred && a.isAlive){
-//				//Si le predateur se trouve dans le champ de vision
-//				if(a.getPosX() >= this.posX - champDeVision && a.getPosX() <= this.posX + champDeVision &&
-//						a.getPosY() >= this.posY - this.champDeVision && a.getPosY() <= this.posY + this.champDeVision){
-//					//TODO
-//					//Faire un algo intéressant pour la fuite avec une part d'aleatoire
-//					
-//					//Pour l'instant le mouton prend juste la direction du predateur proche pour l'eviter
-//					if(a.getPosX() < this.posX){
-//						this.direction = 1;
-//					}else if(a.getPosX() > this.posX){
-//						this.direction = 3;
-//					}else if(a.getPosY() < this.posY){
-//						this.direction = 2;
-//					}else if(a.getPosY() > this.posY){
-//						this.direction = 0;
-//					}
-//				}
-//			}
-//		}
+/*		for(Agent a: world.getAgents()){
+			if(a.isPred && a.isAlive){
+				//Si le predateur se trouve dans le champ de vision
+				if(a.getPosX() >= this.posX - champDeVision && a.getPosX() <= this.posX + champDeVision &&
+						a.getPosY() >= this.posY - this.champDeVision && a.getPosY() <= this.posY + this.champDeVision){
+					//TODO
+					//Faire un algo intéressant pour la fuite avec une part d'aleatoire
+					
+					//Pour l'instant le mouton prend juste la direction du predateur proche pour l'eviter
+					if(a.getPosX() < this.posX){
+						this.direction = 1;
+					}else if(a.getPosX() > this.posX){
+						this.direction = 3;
+					}else if(a.getPosY() < this.posY){
+						this.direction = 2;
+					}else if(a.getPosY() > this.posY){
+						this.direction = 0;
+					}
+				}
+			}
+		}*/
 		
 		
 		
@@ -83,7 +104,6 @@ public class Mouton extends Prey {
 			directionPossible[i] = true;
 		}
 		
-		System.out.println(directionPossible[0]);
 		
 		//Parcourt de la liste
 		for(Agent a : world.getAgents()){
@@ -142,7 +162,6 @@ public class Mouton extends Prey {
 			}
 		}	
 		world.toAdd.add(new Mouton(world, this.posX, this.posY));
-		
 	}
 	
 	public void mourir(){
@@ -155,11 +174,11 @@ public class Mouton extends Prey {
 		deplacementAleatoire();
 		
 		if(rt == 0){
-			//reproduire();
+			reproduire();
 		}
 		
 		if(ht == 0){
-			this.setAlive(false);
+			this.mourir();
 			return;
 		}
 		fuite(); //Fuis si besoin

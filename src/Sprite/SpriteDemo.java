@@ -28,13 +28,12 @@ public class SpriteDemo extends JPanel {
 	private Image fireSprite;
 	private Image ashesSprite;
 	private Image rockSprite;
-	private Image loupSprite;
-	private Image moutonSprite;
+	
 	private Image lavaSprite;
 	private Image obsiSprite;
 	
 	public static int spriteLength = 16;
-	private static int delai = 1;
+	private static int delai = 1	;
 	
 	private int NbDepartLoup = 20;
 	private int NbDepartMouton = 65;
@@ -54,8 +53,6 @@ public class SpriteDemo extends JPanel {
 			rockSprite = ImageIO.read(new File("src/rock.png"));
 			grassSprite = ImageIO.read(new File("src/grass.png"));
 			desertSprite = ImageIO.read(new File("src/desert.png"));
-			loupSprite = ImageIO.read(new File("src/wolf.png"));
-			moutonSprite = ImageIO.read(new File("src/sheep.png"));
 			lavaSprite = ImageIO.read(new File ("src/Lava.png"));
 			obsiSprite = ImageIO.read(new File ("src/obsidienne.png"));
 		}
@@ -130,11 +127,7 @@ public class SpriteDemo extends JPanel {
 		cloneAgent = new ArrayList<Agent>(myMap.getAgents());
 		for(Agent a : cloneAgent){
 			if(a.isAlive()){
-				if(a instanceof Loup){
-					g2.drawImage(loupSprite,a.getSpritePosX(),a.getSpritePosY(),spriteLength,spriteLength, frame);
-				}else if(a instanceof Mouton){
-					g2.drawImage(moutonSprite,a.getSpritePosX(),a.getSpritePosY(),spriteLength,spriteLength, frame);
-				}
+				a.afficher(g2, frame);
 			}
 		}
 	}

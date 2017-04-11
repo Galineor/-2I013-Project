@@ -1,6 +1,10 @@
 package Agent;
 
 
+import java.awt.Graphics2D;
+
+import javax.swing.JFrame;
+
 import Environnement.*;
 import Sprite.*;
 
@@ -28,6 +32,8 @@ public abstract class Agent {
 	protected int reprodTime;
 	protected int hungerTime;
 	protected int ht, rt; //Compteur de faim et de reproduction
+	
+	protected boolean isOnFire;
 
 	public Agent(Map world){
 		this.direction = 0;
@@ -35,6 +41,7 @@ public abstract class Agent {
 		this.world = world;
 		this.spritePosX = this.spritePosY = -1;
 		this.belongPack = false; // De base aucun agent n'appartiennent a un groupe
+		this.isOnFire = false;
 	}
 	
 	public abstract void Step();
@@ -187,6 +194,47 @@ public abstract class Agent {
 		
 		return false;
 	}
+	
+	public void setOnFire(){
+		this.isOnFire = true;
+		//TODO init compteur de feu pour mort
+	}
+	
+	public void interactEnvironment(){
+		Terrain terrain = world.getTerrain()[posX][posY];
+		
+		//Si l'agent se trouve sur un arbre en feu, il prend feu
+		if(terrain.type == 4){
+			this.setOnFire();
+			return;
+		}
+		
+		//Si l'agent se trouve sur de la lave, il meurt
+		else if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
+			this.mourir();
+			return;
+		}
+		
+		//On verifie si les cases autour sont de la lave, si oui, l'agent prend feu
+		terrain = world.getTerrain()[posX+1][posY];
+		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
+			this.setOnFire();
+		}
+		terrain = world.getTerrain()[posX-1][posY];
+		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
+			this.setOnFire();
+		}
+		terrain = world.getTerrain()[posX][posY+1];
+		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
+			this.setOnFire();
+		}
+		terrain = world.getTerrain()[posX][posY-1];
+		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
+			this.setOnFire();
+		}
+	}
+	
+	public abstract void afficher(Graphics2D g2, JFrame frame);
 	
 	public abstract void mourir();
 

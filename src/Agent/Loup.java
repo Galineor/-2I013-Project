@@ -1,6 +1,14 @@
 package Agent;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+
 import Environnement.*;
+import Sprite.SpriteDemo;
 
 public class Loup extends Pred {
 
@@ -14,14 +22,13 @@ public class Loup extends Pred {
 	private int cptDeplacement;
 	private int cptRepos;
 	private int cptChasse;
-	
 	protected Groupe<Loup> pack;
 	
-	
+	private Image loupSprite;
 
 	public Loup(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
-		super(world, 200, 125);
+		super(world, 125, 200);
 		int x = (int)(Math.random()*world.getWidth());
 		int y = (int)(Math.random()*world.getHeight());
 		
@@ -31,11 +38,18 @@ public class Loup extends Pred {
 			y = (int)(Math.random()*world.getHeight());
 		}
 		initAttributes(this, x, y, null);
+		
+		try{
+			loupSprite = ImageIO.read(new File("src/wolf.png"));
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	public Loup(Map world, int x, int y) {
-		super(world, 100, 180);
-		initAttributes(this, x, y, null);
+		this(world);
+		this.setPosX(x);
+		this.setPosY(y);
 	}
 
 	public void initAttributes(Agent a, int x, int y, Agent parent){
@@ -55,6 +69,10 @@ public class Loup extends Pred {
 		((Loup)a).cptChasse = 0;
 		((Loup)a).pack = null;
 		a.belongPack = false;
+	}
+	
+	public void afficher(Graphics2D g2, JFrame frame){
+		g2.drawImage(loupSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
 	}
 
 	public void reproduire(){
