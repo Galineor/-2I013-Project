@@ -35,7 +35,7 @@ public class SpriteDemo extends JPanel {
 	public static int spriteLength = 16;
 	private static int delai = 5;
 	
-	private int NbDepartLoup = 10;
+	private int NbDepartLoup = 20;
 	private int NbDepartMouton = 65;
 	private int NbDepartAlligator = 20;
 	
@@ -77,6 +77,7 @@ public class SpriteDemo extends JPanel {
 		frame.add(this);
 		frame.setSize(tailleX*spriteLength+16, tailleY*spriteLength+40);
 		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
 	}
