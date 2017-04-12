@@ -33,10 +33,11 @@ public class SpriteDemo extends JPanel {
 	private Image obsiSprite;
 	
 	public static int spriteLength = 16;
-	private static int delai = 1	;
+	private static int delai = 5;
 	
-	private int NbDepartLoup = 20;
+	private int NbDepartLoup = 10;
 	private int NbDepartMouton = 65;
+	private int NbDepartAlligator = 20;
 	
 	private int tailleX =40, tailleY = 40;
 	private Map myMap;
@@ -68,7 +69,10 @@ public class SpriteDemo extends JPanel {
 		for(int i=0; i< NbDepartMouton; i++){
 			myMap.getAgents().add(new Mouton(myMap));
 		}
-		
+		for(int i=0; i< NbDepartAlligator; i++){
+			myMap.getAgents().add(new Alligator(myMap));
+		}
+			
 		frame = new JFrame("World of Sprite");
 		frame.add(this);
 		frame.setSize(tailleX*spriteLength+16, tailleY*spriteLength+40);

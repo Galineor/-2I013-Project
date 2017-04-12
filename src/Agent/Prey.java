@@ -1,13 +1,9 @@
 package Agent;
 import Environnement.*;
 
-public abstract class Prey extends Agent {
-	protected int champDeVision; //Distance a laquelle la proie peut detecter un predateur
-	
+public abstract class Prey extends Agent {	
 	public Prey(Map world, int hungerTime, int reprodTime) {
-		super(world);
+		super(world, hungerTime, reprodTime);
 		this.isPred = false;
-		this.reprodTime = reprodTime;
-		this.hungerTime = hungerTime;
 	}
 }

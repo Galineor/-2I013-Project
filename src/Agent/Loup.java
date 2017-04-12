@@ -12,9 +12,6 @@ import Sprite.SpriteDemo;
 
 public class Loup extends Pred {
 
-	private boolean isChasing;
-	public final int ageAdulte = 40;
-	public final int ageVieux = 100;
 	public final int deplacement = 20;
 	public final int repos = 5;
 	public final int chasse = 15;
@@ -23,7 +20,7 @@ public class Loup extends Pred {
 	private int cptRepos;
 	private int cptChasse;
 	protected Groupe<Loup> pack;
-	
+
 	private Image loupSprite;
 
 	public Loup(Map world) {
@@ -31,14 +28,14 @@ public class Loup extends Pred {
 		super(world, 125, 200);
 		int x = (int)(Math.random()*world.getWidth());
 		int y = (int)(Math.random()*world.getHeight());
-		
+
 		//Tant qu'il y a de l'eau sur le spawn, on change de spawn
 		while(world.getTerrain()[x][y].type == 2){
 			x = (int)(Math.random()*world.getWidth());
 			y = (int)(Math.random()*world.getHeight());
 		}
 		initAttributes(this, x, y, null);
-		
+
 		try{
 			loupSprite = ImageIO.read(new File("src/wolf.png"));
 		}catch(Exception e){
@@ -70,15 +67,19 @@ public class Loup extends Pred {
 		((Loup)a).pack = null;
 		a.belongPack = false;
 	}
-	
+
 	public void afficher(Graphics2D g2, JFrame frame){
+		if(getSpritePosX() == -1 || getSpritePosY() == -1){
+			this.spritePosX = this.posX * SpriteDemo.spriteLength;
+			this.spritePosY = this.posY * SpriteDemo.spriteLength;
+		}
 		g2.drawImage(loupSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
 	}
 
 	public void reproduire(){
 		rt = reprodTime;
 		for(Agent a : world.getAgents()){
-			if(a.isPred && !a.isAlive){
+			if(a instanceof Loup && !a.isAlive){
 				initAttributes(a, this.posX, this.posY, this);
 				return;
 			}
@@ -89,7 +90,7 @@ public class Loup extends Pred {
 	public void chasser(){
 		isChasing = false;
 		for(Agent a : world.getAgents()){
-			if(!a.isPred && a.isAlive()){
+			if(!a.isPred && a.isAlive() && !a.estCache){
 				if(a.posY >= this.posY - 4 && a.posY<=this.posY && a.posX == this.posX){
 					this.direction = 0;
 					isChasing = true;
@@ -109,7 +110,7 @@ public class Loup extends Pred {
 			}
 		}
 	}
-	
+
 	public void mourir(){
 		this.setAlive(false);
 		if(this.belongPack){
@@ -121,7 +122,7 @@ public class Loup extends Pred {
 				return;
 			}
 			this.pack.updateLeader();
-			
+
 		}
 	}
 
@@ -131,44 +132,22 @@ public class Loup extends Pred {
 		updatePrevPos();
 		//Si le loup a trop faim, il meurt
 
-		if(ht <= 0){
+		if(ht <= 0 || age == ageMort){
 			this.mourir();
 			return;
 		}
-		if(age<40){
+		if(age<ageAdulte){
 			comportementJeune();
-		}else{
+		}else if(age<ageVieux){
 			comportementAdulte();
+		}else{
+			comportementVieux();
 		}
+
 		age++;
 	}
 
 
-
-	@Override
-	public void comportementJeune() {
-
-		/* 
-		 * Suit le parent
-		 * Pas necessaire de manger
-		 * Pas de reproduction
-		 * Endurance forte
-		 */
-
-		//S'il y a un parent : on le suit
-		if(parent != null && parent.isAlive()){
-			moveToward(parent);
-		}
-		//Si pas de parents, le louveteau devient adulte
-		else{
-			age = ageAdulte;
-			comportementAdulte();
-			this.cptDeplacement = deplacement;
-		}
-
-
-	}
-	
 	public void gestionPack(){
 		for(Agent a : world.getAgents()){
 			if(a instanceof Loup && a.isAlive && !a.equals(this)){
@@ -201,6 +180,33 @@ public class Loup extends Pred {
 		}
 	}
 
+
+	@Override
+	public void comportementJeune() {
+
+		/* 
+		 * Suit le parent
+		 * Pas necessaire de manger
+		 * Pas de reproduction
+		 * Endurance forte
+		 */
+
+		//S'il y a un parent : on le suit
+		if(parent != null && parent.isAlive()){
+			moveToward(parent);
+		}
+		//Si pas de parents, le louveteau devient adulte
+		else{
+			age = ageAdulte;
+			comportementAdulte();
+			this.cptDeplacement = deplacement;
+		}
+
+
+	}
+
+
+
 	@Override
 	public void comportementAdulte() {
 		/*
@@ -217,15 +223,15 @@ public class Loup extends Pred {
 		if(rt == 0){
 			reproduire();
 		}
-		
+
 		gestionPack();
-		
+
 		if(!belongPack || (this.belongPack && this.pack.leader == this)){
 			//On verifie si on peut creer une meute
-			
+
 			//Si on n'appatient pas a une meute, on regarde si on peut en creer une
-			
-			
+
+
 			//Arbre de comportement
 			if(cptDeplacement > 0){
 				cptDeplacement--;
@@ -261,7 +267,7 @@ public class Loup extends Pred {
 				cptChasse = 0;
 				cptDeplacement = deplacement;
 			}
-			
+
 			chasser();
 			correctDirection(); //Permet de corriger la direction si le deplacement n'est pas possible dans la direction actuelle
 			move(direction, 1);
@@ -271,9 +277,9 @@ public class Loup extends Pred {
 				moveToward(this.pack.leader);
 			}
 		}
-		
-		
-				
+
+
+
 
 		//On essaie de manger apres le deplacemnt
 		manger();

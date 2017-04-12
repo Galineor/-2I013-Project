@@ -33,15 +33,29 @@ public abstract class Agent {
 	protected int hungerTime;
 	protected int ht, rt; //Compteur de faim et de reproduction
 	
+	protected int ageAdulte;
+	protected int ageVieux;
+	protected int ageMort; // Age auxquels l'agent est trop vieux pour continuer a vivre
+	
+	protected int champDeVision;
+	
+	protected boolean estCache; //Indique si l'agent est detectable par les autres agents
+	
 	protected boolean isOnFire;
 
-	public Agent(Map world){
+	public Agent(Map world, int hungerTime, int reprodTime){
 		this.direction = 0;
 		this.isAlive = true;
 		this.world = world;
 		this.spritePosX = this.spritePosY = -1;
 		this.belongPack = false; // De base aucun agent n'appartiennent a un groupe
 		this.isOnFire = false;
+		this.estCache = false;
+		this.hungerTime = hungerTime;
+		this.reprodTime = reprodTime;
+		this.ageMort = hungerTime*3;
+		this.ageAdulte = ageMort/5;
+		this.ageVieux = ageMort - ageMort/5;
 	}
 	
 	public abstract void Step();
@@ -49,29 +63,24 @@ public abstract class Agent {
 	public void updatePrevPos(){
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
-		spritePosX = this.prevPosX*16;
-		spritePosY = this.prevPosY*16;
+		spritePosX = this.prevPosX*SpriteDemo.spriteLength;
+		spritePosY = this.prevPosY*SpriteDemo.spriteLength;
 	}
 	
 	public void StepSprite(){
-		//TODO Gerer les animations de deplacement torique
 		if(prevPosX != -1 && prevPosY != -1){
 			if(prevPosX != this.posX || prevPosY != this.posY){
 				if(prevPosX < posX){
-					if(direction == 1)
-						spritePosX += posX - prevPosX;
+					spritePosX += posX - prevPosX;
 				} 
 				if(prevPosX > posX){
-					if(direction == 3)
-						spritePosX -= prevPosX - posX;
+					spritePosX -= prevPosX - posX;
 				} 
 				if(prevPosY < posY){
-					if(direction == 2)
-						spritePosY += posY - prevPosY;
+					spritePosY += posY - prevPosY;
 				} 
 				if(prevPosY > posY){
-					if(direction == 0)
-						spritePosY -= prevPosY - posY;
+					spritePosY -= prevPosY - posY;
 				}
 			}else{
 				spritePosX = this.posX*SpriteDemo.spriteLength;
@@ -106,16 +115,16 @@ public abstract class Agent {
 		 switch ( direction ) 
 		 {
          	case 0: // nord
-         		posY = ( posY - distance + world.getHeight() ) % world.getHeight();
+         		posY = posY - distance;
          		break;
          	case 1:	// est
-         		posX = ( posX + distance + world.getWidth() ) % world.getWidth();
+         		posX = posX + distance;
  				break;
          	case 2:	// sud
-         		posY = ( posY + distance + world.getHeight() ) % world.getHeight();
+         		posY = posY + distance;
  				break;
          	case 3:	// ouest
-         		posX = ( posX - distance + world.getWidth() ) % world.getWidth();
+         		posX = posX - distance;
  				break;
 		 }
 		
@@ -133,34 +142,59 @@ public abstract class Agent {
 		}else{
 			direction = -1;
 		}
+		
 		correctDirection();
+		move(direction, 1);
+	}
+	
+	//Fonction permettant de se deplacer a n'importe quelle position en 1 iteration ( a utiliser uniquement avec des conditions realistes )
+	public void moveTo(int x, int y){
+		this.setPosX(x);
+		this.setPosY(y);
+	}
+	
+	//Deplace vers une position en prenant en compte ou non les correction de direction
+	public void moveToward(int x, int y, boolean correctionDirection){
+		if(x > this.posX){
+			direction = 1;
+		}else if(x < this.posX){
+			direction = 3;
+		}else if(y > this.posY){
+			direction = 2;
+		}else if(y < this.posY){
+			direction = 0;
+		}else{
+			direction = -1;
+		}
+		
+		if(correctionDirection){
+			correctDirection();
+		}
 		move(direction, 1);
 	}
 	
 	public void correctDirection(){
 		//Si l'agent ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
-		if(isWaterDirection(direction)){
+		if(isOutBoundsDirection(direction) || isWaterDirection(direction)){
 			if ( Math.random() > 0.5 ){ // au hasard
 				for(int i=0; i<3; i++){
 					direction = (direction+1) %4;
-					if(!isWaterDirection(direction)){
-						break;
+					if(!isOutBoundsDirection(direction) && !isWaterDirection(direction)){
+						return;
 					}
 				}
 			}
 			else{
 				for(int i=0; i<3; i++){
 					direction = (direction-1+4) %4;
-					if(!isWaterDirection(direction)){
-						break;
+					if(!isOutBoundsDirection(direction) && !isWaterDirection(direction)){
+						return;
 					}
 				}
 			}
 			
-			if(isWaterDirection(direction)){
-				//L'agent est entouré d'eau, il ne peut pas se deplacer
-				direction = -1;
-			}
+			// L'agent ne peut bouger dans aucune direction
+			direction = -1;
 		}
 	}
 	
@@ -171,28 +205,47 @@ public abstract class Agent {
 		
 		switch(d){
 		case 0:
-			if(world.getTerrain()[posX][(posY - 1 + world.getHeight()) % world.getHeight()].type == 2){
+			if(world.getTerrain()[posX][posY - 1].type == 2){
 				return true;
 			}
 			break;
 		case 1:
-			if(world.getTerrain()[ (posX + 1 + world.getWidth()) % world.getWidth()][posY].type== 2){
+			if(world.getTerrain()[posX + 1][posY].type== 2){
 				return true;
 			}
 			break;
 		case 2:
-			if(world.getTerrain()[posX][(posY + 1 + world.getHeight()) % world.getHeight()].type == 2){
+			if(world.getTerrain()[posX][posY + 1].type == 2){
 				return true;
 			}
 			break;
 		case 3:
-			if(world.getTerrain()[(posX - 1 + world.getWidth()) % world.getWidth()][posY].type == 2){
+			if(world.getTerrain()[posX - 1][posY].type == 2){
 				return true;
 			}
 			break;
 		}
 		
 		return false;
+	}
+	
+	public boolean isOutBoundsDirection(int direction){
+		int width = this.world.getWidth();
+		int height = this.world.getHeight();
+		
+		switch(direction){
+		case 0:
+			return posY-1 < 0;
+		case 1:
+			return posX+1 >= width;
+		case 2:
+			return posY+1 >= height;
+		case 3:
+			return posX-1 < 0;
+		default:
+			return false;
+			
+		}
 	}
 	
 	public void setOnFire(){

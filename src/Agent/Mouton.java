@@ -16,7 +16,7 @@ public class Mouton extends Prey {
 	
 	public Mouton(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
-		super(world, 125, 200);
+		super(world, 500, 200);
 		int x = -1 ,y = -1;
 		boolean goodPlacement = false;
 		
@@ -54,7 +54,7 @@ public class Mouton extends Prey {
 		a.setAlive(true);
 		a.setPosX(x);
 		a.setPosY(y);
-		((Prey)a).champDeVision = 3;
+		a.champDeVision = 3;
 		((Prey)a).setRt(reprodTime);
 		((Prey)a).setHt(hungerTime);
 		a.direction = (int)(Math.random()*4);
@@ -65,35 +65,15 @@ public class Mouton extends Prey {
 	}
 	
 	public void afficher(Graphics2D g2, JFrame frame){
+		if(getSpritePosX() == -1 || getSpritePosY() == -1){
+			this.spritePosX = this.posX * SpriteDemo.spriteLength;
+			this.spritePosY = this.posY * SpriteDemo.spriteLength;
+		}
 		g2.drawImage(moutonSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
 	}
 	
 	//Regarde les alentours de la proie et engage la fuite de la proe vers une zone (peut etre) safe
 	public void fuite(){
-/*		for(Agent a: world.getAgents()){
-			if(a.isPred && a.isAlive){
-				//Si le predateur se trouve dans le champ de vision
-				if(a.getPosX() >= this.posX - champDeVision && a.getPosX() <= this.posX + champDeVision &&
-						a.getPosY() >= this.posY - this.champDeVision && a.getPosY() <= this.posY + this.champDeVision){
-					//TODO
-					//Faire un algo intéressant pour la fuite avec une part d'aleatoire
-					
-					//Pour l'instant le mouton prend juste la direction du predateur proche pour l'eviter
-					if(a.getPosX() < this.posX){
-						this.direction = 1;
-					}else if(a.getPosX() > this.posX){
-						this.direction = 3;
-					}else if(a.getPosY() < this.posY){
-						this.direction = 2;
-					}else if(a.getPosY() > this.posY){
-						this.direction = 0;
-					}
-				}
-			}
-		}*/
-		
-		
-		
 		//Algo de fuite
 		
 		//On utilise un tableau de boolean pour connaitres les directions de fuites possibles
@@ -107,7 +87,7 @@ public class Mouton extends Prey {
 		
 		//Parcourt de la liste
 		for(Agent a : world.getAgents()){
-			if(!a.isAlive || !a.isPred){
+			if(!a.isAlive || !a.isPred || a.estCache){
 				continue;
 			}
 			
@@ -156,7 +136,7 @@ public class Mouton extends Prey {
 	public void reproduire(){
 		rt = reprodTime;
 		for(Agent a : world.getAgents()){
-			if(!a.isPred && !a.isAlive){
+			if(a instanceof Mouton && !a.isAlive){
 				initAttributes(a, this.posX, this.posY, this);
 				return;
 			}

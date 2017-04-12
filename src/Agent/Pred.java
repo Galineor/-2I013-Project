@@ -3,11 +3,11 @@ package Agent;
 import Environnement.*;
 
 public abstract class Pred extends Agent {
+	protected boolean isChasing;
+	
 	public Pred(Map world, int hungerTime, int reprodTime) {
-		super(world);
+		super(world, hungerTime, reprodTime);
 		this.isPred = true;
-		this.hungerTime = hungerTime;
-		this.reprodTime = reprodTime;
 	}
 	
 	public boolean manger(){
