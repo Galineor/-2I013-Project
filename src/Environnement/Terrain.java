@@ -1,5 +1,7 @@
 package Environnement;
 
+
+
 public class Terrain {
 	
 	public int type; //0=Plaine 1=Desert 2=Eau 3=Terre 4=Lava 5=obsidienne
@@ -11,6 +13,8 @@ public class Terrain {
 						//peut etre mange a 5
 						//terrain devient terre si pousse == 0
 	public int cptLAVA = -1; //compteur durciucement de la lave (lave => obsi)
+	
+	private boolean foudre = false; //presence d'un eclair
 	
 	public Terrain(int type,int water, int alt, boolean tree){
 		this.type = type;
@@ -39,6 +43,15 @@ public class Terrain {
 	
 	public void setPousse (int pousse){
 		this.pousse = pousse;
+	}
+
+	
+	public boolean isFoudre() {
+		return foudre;
+	}
+
+	public void setFoudre(boolean foudre) {
+		this.foudre = foudre;
 	}
 	
 }
