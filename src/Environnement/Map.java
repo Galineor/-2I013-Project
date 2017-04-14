@@ -21,7 +21,7 @@ public class Map {
 		
 		terrain = new Terrain[dx][dy];
 
-		agents = new ArrayList<Agent>();		
+		agents = new ArrayList<Agent>();
 		boolean tree;
 		
 		for (int x = 0; x < terrain.length; x++) {
@@ -80,9 +80,39 @@ public class Map {
 	public void StepWorld(){
 		majForet(terrain);
 		majEau();
+		majHerbe();
 		if (Math.random() < 0.001 && terrain[dx/2][dy/2].type != 4)
 			Volcan (terrain);
 		majLAVA();
+	}
+	
+	public void majHerbe (){
+		int x, y; //coordonnées aleatoires
+		int p; //variabble de pousse de la case actuelle
+		
+		for (int i = 0; i < terrain.length / 3; i++){
+			for (int j = 0; j < terrain[0].length / 3; j++){
+				x = (int)(Math.random() * dx);
+				y = (int)(Math.random() * dy);
+				p = terrain[x][y].getPousse();
+				
+				if (terrain[x][y].type == 3 || terrain[x][y].type == 0){
+					//pousse si type == terre
+					if (terrain[x][y].type == 3)
+						terrain[x][y].setPousse(p + 1);
+					
+					//terrain pousse > 3 == plaines (herbe a manger)
+					//sinon == terre
+					if (terrain[x][y].getPousse() > 3)
+						terrain[x][y].type = 0;
+					else
+						terrain[x][y].type = 3;
+
+					//l'herbe pousse
+					terrain[x][y].setPousse(p + 1);
+				}
+			}
+		}
 	}
 	
 	public void majForet (Terrain[][] t){
@@ -200,31 +230,61 @@ public class Map {
 					
 				}else if (terrain[(x - 1 + dx)% dx][y].water > terrain[x][y].water && terrain[(x - 1 + dx)% dx][y].water > 1
 						&& terrain[(x - 1 + dx)% dx][y].type == 4){
-					terrain[x][y].water ++;
-					terrain[(x - 1 + dx)% dx][y].water --;
-					terrain[x][y].type = 4;
-					terrain[x][y].cptLAVA = 5;
+					
+					if (terrain[x][y].type == 2){
+						terrain[x][y].cptLAVA = -1;
+						terrain[x][y].type = 5;
+						terrain[x][y].water = 0;
+						terrain[(x - 1 + dx)% dx][y].water --;
+					}else{
+						terrain[x][y].water ++;
+						terrain[(x - 1 + dx)% dx][y].water --;
+						terrain[x][y].type = 4;
+						terrain[x][y].cptLAVA = 5;
+					}
 					
 				}else if (terrain[(x + 1)% dx][y].water > terrain[x][y].water && terrain[(x + 1)% dx][y].water > 1
 						&& terrain[(x + 1)% dx][y].type == 4){
-					terrain[x][y].water ++;
-					terrain[(x + 1)% dx][y].water --;
-					terrain[x][y].type = 4;
-					terrain[x][y].cptLAVA = 5;
+					if (terrain[x][y].type == 2){
+						terrain[x][y].cptLAVA = -1;
+						terrain[x][y].type = 5;
+						terrain[x][y].water = 0;
+						terrain[(x + 1)% dx][y].water --;
+					}else{
+						terrain[x][y].water ++;
+						terrain[(x + 1)% dx][y].water --;
+						terrain[x][y].type = 4;
+						terrain[x][y].cptLAVA = 5;
+					}
 					
 				}else if(terrain[x][(y - 1 + dy)% dy].water > terrain[x][y].water && terrain[x][(y - 1 + dx)% dx].water > 1
 						&& terrain[x][(y - 1 + dx)% dx].type == 4){
-					terrain[x][y].water ++;
-					terrain[x][(y - 1 + dy)% dy].water --;
-					terrain[x][y].type = 4;
-					terrain[x][y].cptLAVA = 5;
+					if (terrain[x][y].type == 2){
+						terrain[x][y].cptLAVA = -1;
+						terrain[x][y].type = 5;
+						terrain[x][y].water = 0;
+						terrain[x][(y - 1 + dy)% dy].water --;
+					}else{
+						terrain[x][y].water ++;
+						terrain[x][(y - 1 + dy)% dy].water --;
+						terrain[x][y].type = 4;
+						terrain[x][y].cptLAVA = 5;
+					}
 				
 				}else if(terrain[x][(y + 1)% dy].water > terrain[x][y].water && terrain[x][(y + 1)% dy].water > 1
 						&& terrain[x][(y + 1)% dy].type == 4){
-					terrain[x][y].water ++;
-					terrain[x][(y + 1)% dy].water --;
-					terrain[x][y].type = 4;
-					terrain[x][y].cptLAVA = 5;
+					if (terrain[x][y].type == 2){
+						terrain[x][y].cptLAVA = -1;
+						terrain[x][y].type = 5;
+						terrain[x][y].water = 0;
+						terrain[x][(y + 1)% dy].water --;
+					}else{
+						terrain[x][y].water ++;
+						terrain[x][(y + 1)% dy].water --;
+						terrain[x][y].type = 4;
+						terrain[x][y].cptLAVA = 5;
+					}
+					
 				}
 				if (terrain[x][y].cptLAVA > 0){
 					terrain[x][y].cptLAVA --;
@@ -232,6 +292,8 @@ public class Map {
 			}
 		}
 	}
+	
+	//TODO meteo
 	
 	public Terrain[][] getTerrain(){
 		return this.terrain;

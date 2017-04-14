@@ -28,12 +28,12 @@ public class SpriteDemo extends JPanel {
 	private Image fireSprite;
 	private Image ashesSprite;
 	private Image rockSprite;
-	
 	private Image lavaSprite;
 	private Image obsiSprite;
+	private Image earthSprite;
 	
 	public static int spriteLength = 16;
-	private static int delai = 5;
+	private static int delai = 1;
 	
 	private int NbDepartLoup = 20;
 	private int NbDepartMouton = 65;
@@ -56,6 +56,7 @@ public class SpriteDemo extends JPanel {
 			desertSprite = ImageIO.read(new File("src/desert.png"));
 			lavaSprite = ImageIO.read(new File ("src/Lava.png"));
 			obsiSprite = ImageIO.read(new File ("src/obsidienne.png"));
+			earthSprite = ImageIO.read(new File ("src/terre.png"));
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -63,15 +64,15 @@ public class SpriteDemo extends JPanel {
 		}
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< NbDepartLoup; i++){
-			myMap.getAgents().add(new Loup(myMap));
-		}
-		for(int i=0; i< NbDepartMouton; i++){
-			myMap.getAgents().add(new Mouton(myMap));
-		}
-		for(int i=0; i< NbDepartAlligator; i++){
-			myMap.getAgents().add(new Alligator(myMap));
-		}
+//		for(int i=0; i< NbDepartLoup; i++){
+//			myMap.getAgents().add(new Loup(myMap));
+//		}
+//		for(int i=0; i< NbDepartMouton; i++){
+//			myMap.getAgents().add(new Mouton(myMap));
+//		}
+//		for(int i=0; i< NbDepartAlligator; i++){
+//			myMap.getAgents().add(new Alligator(myMap));
+//		}
 			
 		frame = new JFrame("World of Sprite");
 		frame.add(this);
@@ -94,13 +95,23 @@ public class SpriteDemo extends JPanel {
 				}else if(myMap.getTerrain()[i][j].type == 1){
 					//affiche desert
 					g2.drawImage(desertSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					
 				}else if(myMap.getTerrain()[i][j].type == 2){
 					//affiche l eau
 					g2.drawImage(waterSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					
+				}else if(myMap.getTerrain()[i][j].type == 3){
+					//affiche la terre
+					g2.drawImage(earthSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					
 				}else if(myMap.getTerrain()[i][j].type == 4){
+					//affiche la lave
 					g2.drawImage(lavaSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					
 				}else if(myMap.getTerrain()[i][j].type == 5){
+					//affiche obsidienne
 					g2.drawImage(obsiSprite,spriteLength*i,spriteLength*j,spriteLength,spriteLength, frame);
+					
 				}
 				
 				if (myMap.getTerrain()[i][j].isTree){
