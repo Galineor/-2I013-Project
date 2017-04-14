@@ -40,14 +40,15 @@ public class Alligator extends Pred {
 		a.setPosX(x);
 		a.setPosY(y);
 		a.champDeVision = 2;
-		((Pred)a).setRt(reprodTime);
-		((Pred)a).setHt(hungerTime);
+		a.setRt(reprodTime);
+		a.setHt(hungerTime);
 		a.direction = (int)(Math.random()*4);
 		a.estCache = true;
 		a.setAge(0);
 		a.setParent(parent);
 		a.setPrevPosX(-1);
 		a.setPrevPosY(-1);
+		a.isOnFire = false;
 		((Alligator)a).returningToWater = false;
 	}
 	
@@ -70,11 +71,15 @@ public class Alligator extends Pred {
 			this.spritePosY = this.posY * SpriteDemo.spriteLength;
 		}
 		g2.drawImage(alligatorSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		if(isOnFire){
+			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		}
 	}
 
 	@Override
 	public void Step() {
 		updatePrevPos();
+		interactEnvironment();
 		
 		if(rt == 0){
 			reproduire();

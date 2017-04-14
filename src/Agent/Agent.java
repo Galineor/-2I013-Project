@@ -2,7 +2,10 @@ package Agent;
 
 
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.io.File;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import Environnement.*;
@@ -24,6 +27,12 @@ public abstract class Agent {
 	protected boolean belongPack;
 
 	protected int direction;
+	public static final int NORD = 0;
+	public static final int EST = 1;
+	public static final int SUD = 2;
+	public static final int OUEST = 3;
+	public static final int NO_MOVE = -1;
+	
 	protected Map world;
 	
 	protected int age;
@@ -42,6 +51,8 @@ public abstract class Agent {
 	protected boolean estCache; //Indique si l'agent est detectable par les autres agents
 	
 	protected boolean isOnFire;
+	protected int cptOnFire; // Les agents meurent apres quelques iterations
+	protected Image fireSprite;
 
 	public Agent(Map world, int hungerTime, int reprodTime){
 		this.direction = 0;
@@ -56,6 +67,12 @@ public abstract class Agent {
 		this.ageMort = hungerTime*3;
 		this.ageAdulte = ageMort/5;
 		this.ageVieux = ageMort - ageMort/5;
+		
+		try{
+			fireSprite = ImageIO.read(new File("src/fire.png"));
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	public abstract void Step();
@@ -109,21 +126,21 @@ public abstract class Agent {
 	}
 	
 	public void move(int direction, int distance){
-		if(direction == -1){
+		if(direction == NO_MOVE){
 			return;
 		}
 		 switch ( direction ) 
 		 {
-         	case 0: // nord
+         	case NORD: // nord
          		posY = posY - distance;
          		break;
-         	case 1:	// est
+         	case EST:	// est
          		posX = posX + distance;
  				break;
-         	case 2:	// sud
+         	case SUD:	// sud
          		posY = posY + distance;
  				break;
-         	case 3:	// ouest
+         	case OUEST:	// ouest
          		posX = posX - distance;
  				break;
 		 }
@@ -132,15 +149,15 @@ public abstract class Agent {
 	
 	public void moveToward(Agent a){
 		if(a.posX > this.posX){
-			direction = 1;
+			direction = EST;
 		}else if(a.posX < this.posX){
-			direction = 3;
+			direction = OUEST;
 		}else if(a.posY > this.posY){
-			direction = 2;
+			direction = SUD;
 		}else if(a.posY < this.posY){
-			direction = 0;
+			direction = NORD;
 		}else{
-			direction = -1;
+			direction = NO_MOVE;
 		}
 		
 		correctDirection();
@@ -156,15 +173,15 @@ public abstract class Agent {
 	//Deplace vers une position en prenant en compte ou non les correction de direction
 	public void moveToward(int x, int y, boolean correctionDirection){
 		if(x > this.posX){
-			direction = 1;
+			direction = EST;
 		}else if(x < this.posX){
-			direction = 3;
+			direction = OUEST;
 		}else if(y > this.posY){
-			direction = 2;
+			direction = SUD;
 		}else if(y < this.posY){
-			direction = 0;
+			direction = NORD;
 		}else{
-			direction = -1;
+			direction = NO_MOVE;
 		}
 		
 		if(correctionDirection){
@@ -175,11 +192,11 @@ public abstract class Agent {
 	
 	public void correctDirection(){
 		//Si l'agent ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
-		if(isOutBoundsDirection(direction) || isWaterDirection(direction)){
+		if(isOutBoundsDirection(direction) || isWaterDirection(direction) || isLavaDirection(direction)){
 			if ( Math.random() > 0.5 ){ // au hasard
 				for(int i=0; i<3; i++){
 					direction = (direction+1) %4;
-					if(!isOutBoundsDirection(direction) && !isWaterDirection(direction)){
+					if(!isOutBoundsDirection(direction) && !isWaterDirection(direction) && !isLavaDirection(direction)){
 						return;
 					}
 				}
@@ -187,7 +204,7 @@ public abstract class Agent {
 			else{
 				for(int i=0; i<3; i++){
 					direction = (direction-1+4) %4;
-					if(!isOutBoundsDirection(direction) && !isWaterDirection(direction)){
+					if(!isOutBoundsDirection(direction) && !isWaterDirection(direction) && !isLavaDirection(direction)){
 						return;
 					}
 				}
@@ -204,23 +221,54 @@ public abstract class Agent {
 		}
 		
 		switch(d){
-		case 0:
+		case NORD:
 			if(world.getTerrain()[posX][posY - 1].type == 2){
 				return true;
 			}
 			break;
-		case 1:
+		case EST:
 			if(world.getTerrain()[posX + 1][posY].type== 2){
 				return true;
 			}
 			break;
-		case 2:
+		case SUD:
 			if(world.getTerrain()[posX][posY + 1].type == 2){
 				return true;
 			}
 			break;
-		case 3:
+		case OUEST:
 			if(world.getTerrain()[posX - 1][posY].type == 2){
+				return true;
+			}
+			break;
+		}
+		
+		return false;
+	}
+	
+	public boolean isLavaDirection(int d){
+		if(d == -1){
+			return false;
+		}
+		
+		switch(d){
+		case NORD:
+			if(world.getTerrain()[posX][posY - 1].type == 4){
+				return true;
+			}
+			break;
+		case EST:
+			if(world.getTerrain()[posX + 1][posY].type== 4){
+				return true;
+			}
+			break;
+		case SUD:
+			if(world.getTerrain()[posX][posY + 1].type == 4){
+				return true;
+			}
+			break;
+		case OUEST:
+			if(world.getTerrain()[posX - 1][posY].type == 4){
 				return true;
 			}
 			break;
@@ -234,13 +282,13 @@ public abstract class Agent {
 		int height = this.world.getHeight();
 		
 		switch(direction){
-		case 0:
+		case NORD:
 			return posY-1 < 0;
-		case 1:
+		case EST:
 			return posX+1 >= width;
-		case 2:
+		case SUD:
 			return posY+1 >= height;
-		case 3:
+		case OUEST:
 			return posX-1 < 0;
 		default:
 			return false;
@@ -250,40 +298,67 @@ public abstract class Agent {
 	
 	public void setOnFire(){
 		this.isOnFire = true;
-		//TODO init compteur de feu pour mort
+		this.cptOnFire = (int)(Math.random()*5+1); // Compteur initialise entre 1 et 5
 	}
 	
 	public void interactEnvironment(){
 		Terrain terrain = world.getTerrain()[posX][posY];
 		
+		if(this.isOnFire){
+			//Les agents en feu enflamment les arbres sur leur position
+			if(terrain.isTree && terrain.getAFA()==0){
+				terrain.setAFA(1);
+			}
+			
+			//Les agents meurent apres quelques iterations en feu
+			if(cptOnFire <= 0){
+				this.mourir();
+			}
+			cptOnFire--;
+		}
+		
 		//Si l'agent se trouve sur un arbre en feu, il prend feu
 		if(terrain.type == 4){
-			this.setOnFire();
+			this.mourir();
+			return;
+		}
+		
+		
+		//Si l'agent est deja en feu, pas necessaire de verifier s'il risque de prendre feu
+		if(isOnFire){
 			return;
 		}
 		
 		//Si l'agent se trouve sur de la lave, il meurt
 		else if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
-			this.mourir();
+			this.setOnFire();
 			return;
 		}
 		
 		//On verifie si les cases autour sont de la lave, si oui, l'agent prend feu
-		terrain = world.getTerrain()[posX+1][posY];
-		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
-			this.setOnFire();
+		if(!isOutBoundsDirection(EST)){
+			terrain = world.getTerrain()[posX+1][posY];
+			if(terrain.type == 4){
+				this.setOnFire();
+			}
 		}
-		terrain = world.getTerrain()[posX-1][posY];
-		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
-			this.setOnFire();
+		if(!isOutBoundsDirection(OUEST)){
+			terrain = world.getTerrain()[posX-1][posY];
+			if(terrain.type == 4){
+				this.setOnFire();
+			}
 		}
-		terrain = world.getTerrain()[posX][posY+1];
-		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
-			this.setOnFire();
+		if(!isOutBoundsDirection(SUD)){
+			terrain = world.getTerrain()[posX][posY+1];
+			if(terrain.type == 4){
+				this.setOnFire();
+			}
 		}
-		terrain = world.getTerrain()[posX][posY-1];
-		if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
-			this.setOnFire();
+		if(!isOutBoundsDirection(NORD)){
+			terrain = world.getTerrain()[posX][posY-1];
+			if(terrain.type == 4){
+				this.setOnFire();
+			}
 		}
 	}
 	

@@ -16,7 +16,7 @@ public class Mouton extends Prey {
 	
 	public Mouton(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
-		super(world, 500, 200);
+		super(world, 125, 200);
 		int x = -1 ,y = -1;
 		boolean goodPlacement = false;
 		
@@ -55,13 +55,14 @@ public class Mouton extends Prey {
 		a.setPosX(x);
 		a.setPosY(y);
 		a.champDeVision = 3;
-		((Prey)a).setRt(reprodTime);
-		((Prey)a).setHt(hungerTime);
+		a.setRt(reprodTime);
+		a.setHt(hungerTime);
 		a.direction = (int)(Math.random()*4);
 		a.setAge(0);
 		a.setParent(parent);
 		a.setPrevPosX(-1);
 		a.setPrevPosY(-1);
+		a.isOnFire = false;
 	}
 	
 	public void afficher(Graphics2D g2, JFrame frame){
@@ -70,7 +71,26 @@ public class Mouton extends Prey {
 			this.spritePosY = this.posY * SpriteDemo.spriteLength;
 		}
 		g2.drawImage(moutonSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		if(isOnFire){
+			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		}
 	}
+	
+	
+	public void manger(){
+		int pousse;
+		
+		//Si le mouton a faim
+		if(ht <= hungerTime/2){
+			//Alors il mange s'il y a de l'herbe sous ses pieds
+			pousse = world.getTerrain()[posX][posY].getPousse();
+			if(pousse>=5){
+				world.getTerrain()[posX][posY].setPousse(pousse-5);
+				this.setHt(hungerTime/2);
+			}
+		}
+	}
+	
 	
 	//Regarde les alentours de la proie et engage la fuite de la proe vers une zone (peut etre) safe
 	public void fuite(){
@@ -151,6 +171,10 @@ public class Mouton extends Prey {
 	@Override
 	public void Step() {
 		updatePrevPos();
+		interactEnvironment();
+		manger();
+		
+		//TODO Comportements selon l'age
 		deplacementAleatoire();
 		
 		if(rt == 0){
