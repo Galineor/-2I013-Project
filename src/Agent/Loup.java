@@ -53,19 +53,21 @@ public class Loup extends Pred {
 		a.setAlive(true);
 		a.setPosX(x);
 		a.setPosY(y);
-		((Pred)a).setRt(reprodTime);
-		((Pred)a).setHt(hungerTime);
+		a.setRt(reprodTime);
+		a.setHt(hungerTime);
 		a.direction = (int)(Math.random()*4);
-		((Loup)a).isChasing = false;
 		a.setAge(0);
 		a.setParent(parent);
 		a.setPrevPosX(-1);
 		a.setPrevPosY(-1);
+		a.belongPack = false;
+		a.isOnFire = false;
 		((Loup)a).cptDeplacement = deplacement;
 		((Loup)a).cptRepos = 0;
 		((Loup)a).cptChasse = 0;
 		((Loup)a).pack = null;
-		a.belongPack = false;
+		((Loup)a).isChasing = false;
+		
 	}
 
 	public void afficher(Graphics2D g2, JFrame frame){
@@ -74,6 +76,9 @@ public class Loup extends Pred {
 			this.spritePosY = this.posY * SpriteDemo.spriteLength;
 		}
 		g2.drawImage(loupSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		if(isOnFire){
+			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		}
 	}
 
 	public void reproduire(){
@@ -130,8 +135,9 @@ public class Loup extends Pred {
 	@Override
 	public void Step() {
 		updatePrevPos();
+		interactEnvironment();
+		
 		//Si le loup a trop faim, il meurt
-
 		if(ht <= 0 || age == ageMort){
 			this.mourir();
 			return;
