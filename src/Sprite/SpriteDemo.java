@@ -22,7 +22,7 @@ public class SpriteDemo extends JPanel {
 	private JFrame frame;
 	
 	public static int spriteLength = 16;
-	private static int delai = 500;
+	private static int delai = 20;
 	
 	private int NbDepartLoup = 20;
 	private int NbDepartMouton = 65;
@@ -33,18 +33,19 @@ public class SpriteDemo extends JPanel {
 
 	
 	private ArrayList<Agent> cloneAgent;
+	
 	public SpriteDemo(){
 		
 		myMap = new Map(tailleX, tailleY);
-//		for(int i=0; i< NbDepartLoup; i++){
-//			myMap.getAgents().add(new Loup(myMap));
-//		}
-//		for(int i=0; i< NbDepartMouton; i++){
-//			myMap.getAgents().add(new Mouton(myMap));
-//		}
-//		for(int i=0; i< NbDepartAlligator; i++){
-//			myMap.getAgents().add(new Alligator(myMap));
-//		}
+		for(int i=0; i< NbDepartLoup; i++){
+			myMap.getAgents().add(new Loup(myMap));
+		}
+		for(int i=0; i< NbDepartMouton; i++){
+			myMap.getAgents().add(new Mouton(myMap));
+		}
+		for(int i=0; i< NbDepartAlligator; i++){
+			myMap.getAgents().add(new Alligator(myMap));
+		}
 			
 		frame = new JFrame("World of Sprite");
 		frame.add(this);
@@ -55,6 +56,7 @@ public class SpriteDemo extends JPanel {
 		
 	}
 
+	//affiche le terrain
 	public void paint(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
 		
@@ -69,6 +71,7 @@ public class SpriteDemo extends JPanel {
 		}
 	}
 	
+	//reaffiche le terrain apres avoir fait une step
 	public void Step(){
 		myMap.Step();
 		for(int i=0; i<=spriteLength; i++){

@@ -20,7 +20,8 @@ import javax.swing.JPanel;
 import Agent.Agent;
 
 public class Map {
-
+	
+	//sprite utlilisé pour la carte
 	private Image waterSprite;
 	private Image grassSprite;
 	private Image desertSprite;
@@ -33,33 +34,34 @@ public class Map {
 	private Image earthSprite;
 	private Image foudreSprite;
 
-	private Terrain[][] terrain;
-	private final int dx, dy;
-	private ArrayList<Agent> agents;
+	private Terrain[][] terrain; //tableau des cases de la carte
+	private final int dx, dy; //taille de la carte
+	private ArrayList<Agent> agents; //liste des agents de la carte
 	public ArrayList<Agent> toAdd = new ArrayList<Agent>();
 	
 	private int[] casesFoudre; //emplacement du dernier coup de foudre
-
-	private final static double OCEAN = 0.3;
-
+	
+	//modification des parametres de la carte
+	private final static double OCEAN = 0.3; 		// 0=>carte remplie d'eau 	1=>carte sans eau			par default: 0.3
+	private final static double FORET = 0.2;		// 0=>aucun arbre 			1=>que des arbres			par default: 0.2
+	private final static double LAC = 0.01;  		// 0=>pas d'eau				1=>carte remplie d'eau		par default: 0.01
+	private final static double PLUIE = 0.1; 		// 
+	private final static double TEMPS_PLUIE = 0.1; 	//
+	
+	//constructeur de la carte
 	public Map(int dx, int dy) {
 		this.dx = dx;
 		this.dy = dy;
 
 		terrain = new Terrain[dx][dy];
 		casesFoudre = new int [2];
-		try {
-			foudreSprite = ImageIO.read(new File("src/foudre.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		agents = new ArrayList<Agent>();
 		boolean tree;
 
 		for (int x = 0; x < terrain.length; x++) {
 			for (int y = 0; y < terrain.length; y++) {
-				if (Math.random() < 0.2)
+				if (Math.random() < FORET)
 					tree = true;
 				else
 					tree = false;
@@ -68,8 +70,10 @@ public class Map {
 				if (Math.random() < (1 - (x * OCEAN)) || Math.random() < (1 - (y * OCEAN))
 						|| Math.random() < (1 - ((dx - x - 1) * OCEAN))
 						|| Math.random() < (1 - ((dy - y - 1) * OCEAN))) {
+					
 					// ajout de la mer autour de l ile
 					terrain[x][y] = new Terrain(2, 2, 0, false);
+					
 				} else {
 					if (x > terrain.length / 2 && y > terrain.length / 2) {
 						// cree une case de desert
@@ -79,10 +83,12 @@ public class Map {
 						if (x > terrain.length / 2 - 2 && y > terrain.length / 2 - 2) {
 							// cree une transition entre le desert et la foret
 							terrain[x][y] = new Terrain((int) (Math.random() * 2), 0, 0, false);
+							
 						} else {
-							if (Math.random() < 0.01) {
+							if (Math.random() < LAC) {
 								// initialisation de la foret avec de l eau
 								terrain[x][y] = new Terrain(2, (int) (Math.random() * 5), 0, false);
+								
 							} else {
 								// initialisation foret
 								terrain[x][y] = new Terrain(0, 0, 0, tree);
@@ -104,6 +110,7 @@ public class Map {
 			lavaSprite = ImageIO.read(new File("src/Lava.png"));
 			obsiSprite = ImageIO.read(new File("src/obsidienne.png"));
 			earthSprite = ImageIO.read(new File("src/terre.png"));
+			foudreSprite = ImageIO.read(new File("src/foudre.png"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -253,7 +260,7 @@ public class Map {
 						terrain[(x + 1) % dx][y].water--;
 						terrain[x][y].type = 2;
 						terrain[x][y].isTree = false;
-
+						
 					}
 					if (terrain[x][(y - 1 + dy) % dy].water > terrain[x][y].water
 							&& terrain[x][(y - 1 + dx) % dx].water > 1 && terrain[x][(y - 1 + dx) % dx].type == 2) {
@@ -303,11 +310,14 @@ public class Map {
 						terrain[x][y].type = 5;
 						terrain[x][y].water = 0;
 						terrain[(x - 1 + dx) % dx][y].water--;
+						terrain[x][y].setEvap(-1);
+						
 					} else {
 						terrain[x][y].water++;
 						terrain[(x - 1 + dx) % dx][y].water--;
 						terrain[x][y].type = 4;
 						terrain[x][y].cptLAVA = 5;
+						
 					}
 
 				} else if (terrain[(x + 1) % dx][y].water > terrain[x][y].water && terrain[(x + 1) % dx][y].water > 1
@@ -317,6 +327,8 @@ public class Map {
 						terrain[x][y].type = 5;
 						terrain[x][y].water = 0;
 						terrain[(x + 1) % dx][y].water--;
+						terrain[x][y].setEvap(-1);
+						
 					} else {
 						terrain[x][y].water++;
 						terrain[(x + 1) % dx][y].water--;
@@ -331,6 +343,8 @@ public class Map {
 						terrain[x][y].type = 5;
 						terrain[x][y].water = 0;
 						terrain[x][(y - 1 + dy) % dy].water--;
+						terrain[x][y].setEvap(-1);
+						
 					} else {
 						terrain[x][y].water++;
 						terrain[x][(y - 1 + dy) % dy].water--;
@@ -345,6 +359,8 @@ public class Map {
 						terrain[x][y].type = 5;
 						terrain[x][y].water = 0;
 						terrain[x][(y + 1) % dy].water--;
+						terrain[x][y].setEvap(-1);
+						
 					} else {
 						terrain[x][y].water++;
 						terrain[x][(y + 1) % dy].water--;
@@ -359,20 +375,24 @@ public class Map {
 			}
 		}
 	}
-
-	// TODO meteo
+	
 	public void meteo() {
-		int x, y;
-		
+		foudre();
+		//pluie();
+		evaporation();
+	}
+	
+	//a une chance de creer un eclair qui mets le feu sur la carte
+	public void foudre (){
+		int x,y;
 		//supprime la foudre du dernier coup de foudre
 		x = casesFoudre[0];
 		y = casesFoudre[1];
 		if (terrain[x][y].isFoudre())
 			terrain[x][y].setFoudre(false);
-		// TODO pluie
 		
 		// foudre
-		if (Math.random() < 1) {
+		if (Math.random() < 0.1) {
 			x = (int) (Math.random() * dx);
 			y = (int) (Math.random() * dy);
 			//mets la foudre sur la case
@@ -380,20 +400,61 @@ public class Map {
 			casesFoudre[0] = x;
 			casesFoudre[1] = y;
 			
-			if (terrain[(x - 1 + dx) % dx][y].isTree)
+			//met en feu la case qui recoit l'eclair et les cases alentours
+			if (terrain[x][y].isTree && terrain[x][y].type == 0)
+				terrain[x][y].setAFA(1);
+			
+			if (terrain[(x - 1 + dx) % dx][y].isTree && terrain[(x - 1 + dx) % dx][y].type == 0)
 				terrain[(x - 1 + dx) % dx][y].setAFA(1);
 			
-			if (terrain[(x + 1) % dx][y].isTree)
+			if (terrain[(x + 1) % dx][y].isTree && terrain[(x + 1) % dx][y].type == 0)
 				terrain[(x + 1) % dx][y].setAFA(1);
 			
-			if (terrain[x][(y - 1 + dy) % dy].isTree)
+			if (terrain[x][(y - 1 + dy) % dy].isTree && terrain[x][(y - 1 + dy) % dy].type == 0)
 				terrain[x][(y - 1 + dy) % dy].setAFA(1);
 			
-			if (terrain[x][(y + 1) % dy].isTree)
+			if (terrain[x][(y + 1) % dy].isTree && terrain[x][(y + 1) % dy].type == 0)
 				terrain[x][(y + 1) % dy].setAFA(1);
 		}
+	}
+	
+	//TODO pluie
+	//gere la pluie de la carte
+	public void pluie(){
+		for (int x = 0; x < terrain.length; x++){
+			for (int y = 0; y < terrain[0].length; y++){
+				
+			}
+		}		
+	}
+	
+	//gere l'evaporation de l'eau sur la carte
+	public void evaporation(){
+		int x,y;
 		
-		// TODO evaporation
+		for (int i = 0; i < terrain.length / 5; i++){
+			for (int j = 0; j < terrain[0].length / 5; j ++){
+				x = (int) (Math.random() * dx);
+				y = (int) (Math.random() * dy);
+				if (terrain[x][y].getEvap() > 0){
+					terrain[x][y].setEvap(terrain[x][y].getEvap() - 1);
+				}else{
+					//enleve une hauteur d'eau si water > 1
+					if(terrain[x][y].water > 1){
+						terrain[x][y].water --;
+						
+					}else{
+						if (x > dx/2 && y > dy/2)
+							terrain[x][y].type = 1;
+						else
+							terrain[x][y].type = 0;
+						
+						terrain[x][y].water = 0;
+					}
+					terrain[x][y].setEvap(-1);
+				}
+			}
+		}
 	}
 
 	//affiche les sprites du terrain
@@ -458,18 +519,22 @@ public class Map {
 		}
 	}
 	
+	
 	public Terrain[][] getTerrain() {
 		return this.terrain;
 	}
 
+	
 	public int getHeight() {
 		return this.dy;
 	}
 
+	
 	public int getWidth() {
 		return this.dx;
 	}
 
+	
 	public ArrayList<Agent> getAgents() {
 		return this.agents;
 	}

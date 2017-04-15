@@ -15,18 +15,41 @@ public class Terrain {
 	public int cptLAVA = -1; //compteur durciucement de la lave (lave => obsi)
 	
 	private boolean foudre = false; //presence d'un eclair
+	private boolean pluie = false; //presence de pluie
+	private int evap = -1; //compteur avant evaporation de l'eau de la case
+	private int tmpPluie = -1; //compteur de duree de la pluie
 	
+	//constructeur des case du terrain
 	public Terrain(int type,int water, int alt, boolean tree){
-		this.type = type;
+		
 		this.water = water;
 		this.altitude = alt;
 		this.isTree = tree;
+		
 		if (type == 0)
 			this.pousse = (int)(Math.random() * 7);
+		if (type == 0 && pousse < 3)
+			this.type = 3;
+		else 
+			this.type = type;
+		
+		if (type == 2){
+			evap = 5;
+		}
+		
 	}
 	
+	//constructeur de terrain rapide
 	public Terrain(){
 		this(0,0,0,false);
+	}
+
+	public int getEvap() {
+		return evap;
+	}
+
+	public void setEvap(int evap) {
+		this.evap = evap;
 	}
 
 	public int getAFA() {
@@ -45,13 +68,29 @@ public class Terrain {
 		this.pousse = pousse;
 	}
 
-	
 	public boolean isFoudre() {
 		return foudre;
 	}
 
 	public void setFoudre(boolean foudre) {
 		this.foudre = foudre;
+	}
+
+	
+	public boolean isPluie() {
+		return pluie;
+	}
+
+	public void setPluie(boolean pluie) {
+		this.pluie = pluie;
+	}
+
+	public int getTmpPluie() {
+		return tmpPluie;
+	}
+
+	public void setTmpPluie(int tmpPluie) {
+		this.tmpPluie = tmpPluie;
 	}
 	
 }
