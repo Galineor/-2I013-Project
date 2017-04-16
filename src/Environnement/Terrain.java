@@ -4,20 +4,23 @@ package Environnement;
 
 public class Terrain {
 	
-	public int type; //0=Plaine 1=Desert 2=Eau 3=Terre 4=Lava 5=obsidienne
-	public int altitude; //altitude de la case
-	public int water; //quantite d eau
-	public boolean isTree; //contient un arbre ??
-	private int AFA = 0; //0= Alive  1= Fire 2=Ashes
-	private int pousse = 0; //taille de l'herbe 
-						//peut etre mange a 5
-						//terrain devient terre si pousse == 0
-	public int cptLAVA = -1; //compteur durciucement de la lave (lave => obsi)
+	public int type; 					//0=Plaine 1=Desert 2=Eau 3=Terre 4=Lava 5=obsidienne
+	public int altitude; 				//altitude de la case
+	public int water; 					//quantite d eau
+	public boolean isTree; 				//contient un arbre ??
+	private int AFA = 0; 				//0= Alive  1= Fire 2=Ashes
+	private int pousse = 0; 			/*taille de l'herbe 
+										peut etre mange a 5
+										terrain devient terre si pousse == 0*/
 	
-	private boolean foudre = false; //presence d'un eclair
-	private boolean pluie = false; //presence de pluie
-	private int evap = -1; //compteur avant evaporation de l'eau de la case
-	private int tmpPluie = -1; //compteur de duree de la pluie
+	public int cptLAVA = -1; 			//compteur durciucement de la lave (lave => obsi)
+	
+	private boolean foudre = false; 	//presence d'un eclair
+	private boolean pluie = false; 		//presence de pluie
+	private int evap = -1; 				//compteur avant evaporation de l'eau de la case
+	private int tempsPluie = -1; 		//compteur de duree de la pluie
+	
+	public final static int	EVAP = 8;	//nombre d'iteration avant evaporation de l'eau 
 	
 	//constructeur des case du terrain
 	public Terrain(int type,int water, int alt, boolean tree){
@@ -85,12 +88,12 @@ public class Terrain {
 		this.pluie = pluie;
 	}
 
-	public int getTmpPluie() {
-		return tmpPluie;
+	public int getTempsPluie() {
+		return tempsPluie;
 	}
 
-	public void setTmpPluie(int tmpPluie) {
-		this.tmpPluie = tmpPluie;
+	public void setTmpPluie(int tempsPluie) {
+		this.tempsPluie = tempsPluie;
 	}
 	
 }

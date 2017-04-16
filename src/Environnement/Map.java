@@ -33,6 +33,7 @@ public class Map {
 	private Image obsiSprite;
 	private Image earthSprite;
 	private Image foudreSprite;
+	private Image rainSprite;
 
 	private Terrain[][] terrain; //tableau des cases de la carte
 	private final int dx, dy; //taille de la carte
@@ -45,8 +46,8 @@ public class Map {
 	private final static double OCEAN = 0.3; 		// 0=>carte remplie d'eau 	1=>carte sans eau			par default: 0.3
 	private final static double FORET = 0.2;		// 0=>aucun arbre 			1=>que des arbres			par default: 0.2
 	private final static double LAC = 0.01;  		// 0=>pas d'eau				1=>carte remplie d'eau		par default: 0.01
-	private final static double PLUIE = 0.1; 		// 
-	private final static double TEMPS_PLUIE = 0.1; 	//
+	private final static double PLUIE = 0.001; 		// 0=>pas de pluie			1=>100% pluie				par default: 0.001
+	private final static double TEMPS_PLUIE = 0.05; // 0=>pluie sans fin		1=>pluie d'une iteration	par default: 0.05
 	
 	//constructeur de la carte
 	public Map(int dx, int dy) {
@@ -111,6 +112,7 @@ public class Map {
 			obsiSprite = ImageIO.read(new File("src/obsidienne.png"));
 			earthSprite = ImageIO.read(new File("src/terre.png"));
 			foudreSprite = ImageIO.read(new File("src/foudre.png"));
+			rainSprite = ImageIO.read(new File("src/rain.png"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -140,10 +142,10 @@ public class Map {
 
 	// effectue les modification apporté a l'environnement
 	public void StepWorld() {
+		meteo();
 		majForet(terrain);
 		majEau();
 		majHerbe();
-		meteo();
 		if (Math.random() < 0.001 && terrain[dx / 2][dy / 2].type != 4)
 			Volcan(terrain);
 		majLAVA();
@@ -161,10 +163,7 @@ public class Map {
 				p = terrain[x][y].getPousse();
 
 				if (terrain[x][y].type == 3 || terrain[x][y].type == 0) {
-					// pousse si type == terre
-					if (terrain[x][y].type == 3)
-						terrain[x][y].setPousse(p + 1);
-
+					
 					// terrain pousse > 3 == plaines (herbe a manger)
 					// sinon == terre
 					if (terrain[x][y].getPousse() > 3)
@@ -252,6 +251,7 @@ public class Map {
 						terrain[(x - 1 + dx) % dx][y].water--;
 						terrain[x][y].type = 2;
 						terrain[x][y].isTree = false;
+						terrain[x][y].setEvap(Terrain.EVAP);
 
 					}
 					if (terrain[(x + 1) % dx][y].water > terrain[x][y].water && terrain[(x + 1) % dx][y].water > 1
@@ -260,6 +260,7 @@ public class Map {
 						terrain[(x + 1) % dx][y].water--;
 						terrain[x][y].type = 2;
 						terrain[x][y].isTree = false;
+						terrain[x][y].setEvap(Terrain.EVAP);
 						
 					}
 					if (terrain[x][(y - 1 + dy) % dy].water > terrain[x][y].water
@@ -268,6 +269,7 @@ public class Map {
 						terrain[x][(y - 1 + dy) % dy].water--;
 						terrain[x][y].type = 2;
 						terrain[x][y].isTree = false;
+						terrain[x][y].setEvap(Terrain.EVAP);
 
 					}
 					if (terrain[x][(y + 1) % dy].water > terrain[x][y].water && terrain[x][(y + 1) % dy].water > 1
@@ -276,6 +278,7 @@ public class Map {
 						terrain[x][(y + 1) % dy].water--;
 						terrain[x][y].type = 2;
 						terrain[x][y].isTree = false;
+						terrain[x][y].setEvap(Terrain.EVAP);
 					}
 				}
 			}
@@ -378,7 +381,7 @@ public class Map {
 	
 	public void meteo() {
 		foudre();
-		//pluie();
+		pluie();
 		evaporation();
 	}
 	
@@ -424,6 +427,33 @@ public class Map {
 		for (int x = 0; x < terrain.length; x++){
 			for (int y = 0; y < terrain[0].length; y++){
 				
+				if (terrain[x][y].type == 2 && terrain[x][y].isPluie())
+					terrain[x][y].setEvap(Terrain.EVAP);
+				
+				if (terrain[x][y].isPluie() && terrain[x][y].type == 0 && terrain[x][y].isTree && terrain[x][y].getAFA() == 1)
+					terrain[x][y].setAFA(0);
+				
+				if(terrain[x][y].type == 2 && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 5){
+					terrain[x][y].water ++;
+				}
+				
+				if(terrain[x][y].type <= 1 && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 10){
+					terrain[x][y].water ++;
+					terrain[x][y].type = 2;
+				}
+				
+				//continue la pluie avec proba de continuer qui diminue a chaque iteration
+				if (terrain[x][y].isPluie() && Math.random() < (TEMPS_PLUIE * terrain[x][y].getTempsPluie())){
+					terrain[x][y].setPluie(false);
+					terrain[x][y].setTmpPluie(-1);
+				}
+				
+				//lance la pluie avec une proba definie pas PLUIE
+				if (!terrain[x][y].isPluie() && Math.random() < PLUIE){
+					terrain[x][y].setPluie(true);
+					terrain[x][y].setTmpPluie(0);
+				}
+				terrain[x][y].setTmpPluie(terrain[x][y].getTempsPluie() + 1);
 			}
 		}		
 	}
@@ -432,13 +462,14 @@ public class Map {
 	public void evaporation(){
 		int x,y;
 		
-		for (int i = 0; i < terrain.length / 5; i++){
-			for (int j = 0; j < terrain[0].length / 5; j ++){
+		for (int i = 0; i < terrain.length/10 ; i++){
+			for (int j = 0; j < terrain[0].length/10 ; j ++){
 				x = (int) (Math.random() * dx);
 				y = (int) (Math.random() * dy);
 				if (terrain[x][y].getEvap() > 0){
 					terrain[x][y].setEvap(terrain[x][y].getEvap() - 1);
-				}else{
+				}
+				if (terrain[x][y].getEvap() == 0){
 					//enleve une hauteur d'eau si water > 1
 					if(terrain[x][y].water > 1){
 						terrain[x][y].water --;
@@ -514,6 +545,10 @@ public class Map {
 				//affiche la foudre
 				if (terrain[i][j].isFoudre()){
 					g2.drawImage(foudreSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
+				}
+				
+				if (terrain[i][j].isPluie()){
+					g2.drawImage(rainSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 				}
 			}
 		}
