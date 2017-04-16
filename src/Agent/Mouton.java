@@ -102,6 +102,7 @@ public class Mouton extends Prey {
 						a.getPosY() >= this.posY - 2 && a.getPosY() <= this.posY + 2){
 					if(!this.belongPack){
 						if(a.belongPack && ((Mouton)a).troupeau.groupe.size() < 5){
+							((Mouton)a).troupeau.add(this);
 							this.troupeau = ((Mouton)a).troupeau;
 							this.belongPack = true;
 						}else if(!a.belongPack){
@@ -124,6 +125,17 @@ public class Mouton extends Prey {
 				}
 			}
 		}
+	}
+	
+	public void quitterGroupe(){
+		if(!belongPack){
+			return;
+		}
+		
+		this.belongPack = false;
+		this.troupeau.groupe.remove(this);
+		this.troupeau.updateLeader();
+		this.troupeau = null;
 	}
 	
 	
@@ -211,11 +223,6 @@ public class Mouton extends Prey {
 		if(this.belongPack){
 			//On supprime les agents qui meurent de la meute
 			this.troupeau.groupe.remove(this);
-			if(this.troupeau.groupe.size() == 1){
-				this.troupeau.groupe.get(0).belongPack = false;
-				this.troupeau.groupe.get(0).troupeau = null;
-				return;
-			}
 			this.troupeau.updateLeader();
 
 		}
@@ -228,16 +235,22 @@ public class Mouton extends Prey {
 			return;
 		}
 		
-		if(belongPack){
-			System.out.println(this.troupeau.groupe.size());
-		}
 		updatePrevPos();
 		interactEnvironment();
 		manger();
 		gestionPack();
 
+		if(belongPack){
+			this.troupeau.updateLeader();
+//			System.out.println(troupeau.leader.posX);
+//			System.out.println(troupeau.leader.posY);
+//			System.out.println(troupeau.leader.age);
+//			System.out.println(troupeau.leader.isAlive);
+//			System.out.println();
+		}
+		
 		if(age < ageAdulte){
-			comportementAdulte();
+			comportementJeune();
 		}else if(age < ageVieux){
 			comportementAdulte();
 		}else{
@@ -254,7 +267,7 @@ public class Mouton extends Prey {
 	@Override
 	public void comportementJeune() {
 		int champDeVisionFuite = 3;
-		if(parent != null && parent.isAlive()){
+		if(parent != null && parent.isAlive() && !parent.belongPack){
 			if(!choixDirectionAvecFuite(champDeVisionFuite)){
 				//Si le mouton n'est pas en danger, il se deplace vers son parent
 				if(distanceFrom(parent) > 2){

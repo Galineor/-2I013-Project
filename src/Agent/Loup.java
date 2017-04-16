@@ -96,7 +96,6 @@ public class Loup extends Pred {
 	}
 
 	public void reproduire(){
-		System.out.println("Reproduction");
 		rt = reprodTime;
 		for(Agent a : world.getAgents()){
 			if(a instanceof Loup && !a.isAlive){
@@ -136,11 +135,6 @@ public class Loup extends Pred {
 		if(this.belongPack){
 			//On supprime les agents qui meurent de la meute
 			this.pack.groupe.remove(this);
-			if(this.pack.groupe.size() == 1){
-				this.pack.groupe.get(0).belongPack = false;
-				this.pack.groupe.get(0).pack = null;
-				return;
-			}
 			this.pack.updateLeader();
 
 		}
@@ -178,6 +172,7 @@ public class Loup extends Pred {
 						a.getPosY() >= this.posY - 2 && a.getPosY() <= this.posY + 2){
 					if(!this.belongPack){
 						if(a.belongPack && ((Loup)a).pack.groupe.size() < 10){
+							((Loup)a).pack.add(this);
 							this.pack = ((Loup)a).pack;
 							this.belongPack = true;
 						}else if(!a.belongPack){
@@ -200,6 +195,17 @@ public class Loup extends Pred {
 				}
 			}
 		}
+	}
+	
+	public void quitterGroupe(){
+		if(!belongPack){
+			return;
+		}
+		
+		this.belongPack = false;
+		this.pack.groupe.remove(this);
+		this.pack.updateLeader();
+		this.pack = null;
 	}
 	
 	public void arbreDeComportement(int tempsDeplacement, int tempsRepos, int tempsChasse){

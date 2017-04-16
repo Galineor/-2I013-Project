@@ -394,6 +394,8 @@ public abstract class Agent {
 		}
 	}
 	
+	public void quitterGroupe(){};
+	
 	public abstract void afficher(Graphics2D g2, JFrame frame, int spriteLength);
 	
 	public abstract void mourir();
