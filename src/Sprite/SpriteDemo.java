@@ -66,7 +66,7 @@ public class SpriteDemo extends JPanel {
 		cloneAgent = new ArrayList<Agent>(myMap.getAgents());
 		for(Agent a : cloneAgent){
 			if(a.isAlive()){
-				a.afficher(g2, frame,spriteLength);
+				a.afficher(g2, frame, spriteLength);
 			}
 		}
 	}

@@ -49,6 +49,14 @@ public class Map {
 	private final static double PLUIE = 0.001; 		// 0=>pas de pluie			1=>100% pluie				par default: 0.001
 	private final static double TEMPS_PLUIE = 0.05; // 0=>pluie sans fin		1=>pluie d'une iteration	par default: 0.05
 	
+	//type de terrain
+	private final static int PLAINE = 0;
+	private final static int DESERT = 1;
+	private final static int EAU = 2;
+	private final static int TERRE = 3;
+	private final static int LAVE = 4;
+	private final static int OBSIDIENNE = 5;
+	
 	//constructeur de la carte
 	public Map(int dx, int dy) {
 		this.dx = dx;
@@ -73,26 +81,26 @@ public class Map {
 						|| Math.random() < (1 - ((dy - y - 1) * OCEAN))){
 					
 					// ajout de la mer autour de l ile
-					terrain[x][y] = new Terrain(2, 2, 0, false);
+					terrain[x][y] = new Terrain(EAU, 2, 0, false);
 					
 				} else {
 					if (x > terrain.length / 2 && y > terrain.length / 2) {
 						// cree une case de desert
-						terrain[x][y] = new Terrain(1, 0, 0, tree);
+						terrain[x][y] = new Terrain(DESERT, 0, 0, tree);
 
 					} else {
 						if (x > terrain.length / 2 - 2 && y > terrain.length / 2 - 2) {
 							// cree une transition entre le desert et la foret
-							terrain[x][y] = new Terrain((int) (Math.random() * 2), 0, 0, false);
+							terrain[x][y] = new Terrain((int) (Math.random() * EAU), 0, 0, false);
 							
 						} else {
 							if (Math.random() < LAC) {
 								// initialisation de la foret avec de l eau
-								terrain[x][y] = new Terrain(2, (int) (Math.random() * 5), 0, false);
+								terrain[x][y] = new Terrain(EAU, (int) (Math.random() * 5), 0, false);
 								
 							} else {
 								// initialisation foret
-								terrain[x][y] = new Terrain(0, 0, 0, tree);
+								terrain[x][y] = new Terrain(PLAINE, 0, 0, tree);
 							}
 						}
 					}
@@ -146,7 +154,7 @@ public class Map {
 		majForet(terrain);
 		majEau();
 		majHerbe();
-		if (Math.random() < 0.001 && terrain[dx / 2][dy / 2].type != 4)
+		if (Math.random() < 0.001 && terrain[dx / 2][dy / 2].type != LAVE)
 			Volcan(terrain);
 		majLAVA();
 	}
@@ -162,14 +170,14 @@ public class Map {
 				y = (int) (Math.random() * dy);
 				p = terrain[x][y].getPousse();
 
-				if (terrain[x][y].type == 3 || terrain[x][y].type == 0) {
+				if (terrain[x][y].type == TERRE || terrain[x][y].type == PLAINE) {
 					
 					// terrain pousse > 3 == plaines (herbe a manger)
 					// sinon == terre
 					if (terrain[x][y].getPousse() > 3)
-						terrain[x][y].type = 0;
+						terrain[x][y].type = PLAINE;
 					else
-						terrain[x][y].type = 3;
+						terrain[x][y].type = TERRE;
 
 					// l'herbe pousse
 					terrain[x][y].setPousse(p + 1);
@@ -184,7 +192,7 @@ public class Map {
 		for (int i = 0; i < (dx * dy) / 4; i++) {
 			x = (int) (Math.random() * dx);
 			y = (int) (Math.random() * dy);
-			if (t[x][y].type == 0) {
+			if (t[x][y].type == PLAINE) {
 				// verifie si la case est bien un arbre
 				if (!t[x][y].isTree) {
 
@@ -197,7 +205,7 @@ public class Map {
 						t[x][y].isTree = true;
 						t[x][y].setAFA(0);
 					} else {
-						if (Math.random() < 0.0005 && t[x][y].getAFA() != 2) {
+						if (t[x][y].getAFA() != 2 && Math.random() < 0.0005) {
 							t[x][y].isTree = true;
 							t[x][y].setAFA(0);
 						}
@@ -206,8 +214,8 @@ public class Map {
 				} else {
 					if (t[x][y].getAFA() == 1) {
 						// les arbres en feu disparraissent si près de lave
-						if (t[(x - 1 + dx) % dx][y].type == 4 || t[(x + 1 + dx) % dx][y].type == 4
-								|| t[x][(y - 1 + dy) % dy].type == 4 || t[x][(y + 1 + dy) % dy].type == 4) {
+						if (t[(x - 1 + dx) % dx][y].type == LAVE || t[(x + 1 + dx) % dx][y].type == LAVE
+								|| t[x][(y - 1 + dy) % dy].type == LAVE || t[x][(y + 1 + dy) % dy].type == LAVE) {
 							t[x][y].setAFA(0);
 							t[x][y].isTree = false;
 						} else {
@@ -223,8 +231,8 @@ public class Map {
 						t[x][y].setAFA(1);
 					}
 
-					if (t[x][y].getAFA() == 0 && (t[(x - 1 + dx) % dx][y].type == 4 || t[(x + 1 + dx) % dx][y].type == 4
-							|| t[x][(y - 1 + dy) % dy].type == 4 || t[x][(y + 1 + dy) % dy].type == 4)) {
+					if (t[x][y].getAFA() == 0 && (t[(x - 1 + dx) % dx][y].type == LAVE || t[(x + 1 + dx) % dx][y].type == LAVE
+							|| t[x][(y - 1 + dy) % dy].type == LAVE || t[x][(y + 1 + dy) % dy].type == LAVE)) {
 						t[x][y].setAFA(1);
 					}
 					
@@ -244,39 +252,40 @@ public class Map {
 			for (int j = 0; j < dy / 3; j++) {
 				x = (int) (Math.random() * dx);
 				y = (int) (Math.random() * dy);
+				
 				if (!terrain[x][y].isTree && terrain[x][y].getAFA() != 2) {
 					if (terrain[(x - 1 + dx) % dx][y].water > terrain[x][y].water
-							&& terrain[(x - 1 + dx) % dx][y].water > 1 && terrain[(x - 1 + dx) % dx][y].type == 2) {
+							&& terrain[(x - 1 + dx) % dx][y].water > 1 && terrain[(x - 1 + dx) % dx][y].type == EAU) {
 						terrain[x][y].water++;
 						terrain[(x - 1 + dx) % dx][y].water--;
-						terrain[x][y].type = 2;
+						terrain[x][y].type = EAU;
 						terrain[x][y].isTree = false;
 						terrain[x][y].setEvap(Terrain.EVAP);
 
 					}
 					if (terrain[(x + 1) % dx][y].water > terrain[x][y].water && terrain[(x + 1) % dx][y].water > 1
-							&& terrain[(x + 1) % dx][y].type == 2) {
+							&& terrain[(x + 1) % dx][y].type == EAU) {
 						terrain[x][y].water++;
 						terrain[(x + 1) % dx][y].water--;
-						terrain[x][y].type = 2;
+						terrain[x][y].type = EAU;
 						terrain[x][y].isTree = false;
 						terrain[x][y].setEvap(Terrain.EVAP);
 						
 					}
 					if (terrain[x][(y - 1 + dy) % dy].water > terrain[x][y].water
-							&& terrain[x][(y - 1 + dx) % dx].water > 1 && terrain[x][(y - 1 + dx) % dx].type == 2) {
+							&& terrain[x][(y - 1 + dx) % dx].water > 1 && terrain[x][(y - 1 + dx) % dx].type == EAU) {
 						terrain[x][y].water++;
 						terrain[x][(y - 1 + dy) % dy].water--;
-						terrain[x][y].type = 2;
+						terrain[x][y].type = EAU;
 						terrain[x][y].isTree = false;
 						terrain[x][y].setEvap(Terrain.EVAP);
 
 					}
 					if (terrain[x][(y + 1) % dy].water > terrain[x][y].water && terrain[x][(y + 1) % dy].water > 1
-							&& terrain[x][(y + 1) % dy].type == 2) {
+							&& terrain[x][(y + 1) % dy].type == EAU) {
 						terrain[x][y].water++;
 						terrain[x][(y + 1) % dy].water--;
-						terrain[x][y].type = 2;
+						terrain[x][y].type = EAU;
 						terrain[x][y].isTree = false;
 						terrain[x][y].setEvap(Terrain.EVAP);
 					}
@@ -287,7 +296,7 @@ public class Map {
 
 	// lancement du volcan
 	public void Volcan(Terrain[][] t) {
-		t[dx / 2][dy / 2].type = 4; // met de la lave au niveau du volcan
+		t[dx / 2][dy / 2].type = LAVE; // met de la lave au niveau du volcan
 		t[dx / 2][dy / 2].water = (int) (Math.random() * 30);
 		t[dx / 2][dy / 2].cptLAVA = 5;
 	}
@@ -302,15 +311,15 @@ public class Map {
 
 				if (terrain[x][y].cptLAVA == 0) {
 					terrain[x][y].cptLAVA = -1;
-					terrain[x][y].type = 5;
+					terrain[x][y].type = OBSIDIENNE;
 					terrain[x][y].water = 0;
 
 				} else if (terrain[(x - 1 + dx) % dx][y].water > terrain[x][y].water
-						&& terrain[(x - 1 + dx) % dx][y].water > 1 && terrain[(x - 1 + dx) % dx][y].type == 4) {
+						&& terrain[(x - 1 + dx) % dx][y].water > 1 && terrain[(x - 1 + dx) % dx][y].type == LAVE) {
 
-					if (terrain[x][y].type == 2) {
+					if (terrain[x][y].type == EAU) {
 						terrain[x][y].cptLAVA = -1;
-						terrain[x][y].type = 5;
+						terrain[x][y].type = OBSIDIENNE;
 						terrain[x][y].water = 0;
 						terrain[(x - 1 + dx) % dx][y].water--;
 						terrain[x][y].setEvap(-1);
@@ -318,16 +327,17 @@ public class Map {
 					} else {
 						terrain[x][y].water++;
 						terrain[(x - 1 + dx) % dx][y].water--;
-						terrain[x][y].type = 4;
+						terrain[x][y].type = LAVE;
 						terrain[x][y].cptLAVA = 5;
 						
 					}
 
 				} else if (terrain[(x + 1) % dx][y].water > terrain[x][y].water && terrain[(x + 1) % dx][y].water > 1
-						&& terrain[(x + 1) % dx][y].type == 4) {
-					if (terrain[x][y].type == 2) {
+						&& terrain[(x + 1) % dx][y].type == LAVE) {
+					
+					if (terrain[x][y].type == EAU) {
 						terrain[x][y].cptLAVA = -1;
-						terrain[x][y].type = 5;
+						terrain[x][y].type = OBSIDIENNE;
 						terrain[x][y].water = 0;
 						terrain[(x + 1) % dx][y].water--;
 						terrain[x][y].setEvap(-1);
@@ -335,15 +345,16 @@ public class Map {
 					} else {
 						terrain[x][y].water++;
 						terrain[(x + 1) % dx][y].water--;
-						terrain[x][y].type = 4;
+						terrain[x][y].type = LAVE;
 						terrain[x][y].cptLAVA = 5;
 					}
 
 				} else if (terrain[x][(y - 1 + dy) % dy].water > terrain[x][y].water
-						&& terrain[x][(y - 1 + dx) % dx].water > 1 && terrain[x][(y - 1 + dx) % dx].type == 4) {
-					if (terrain[x][y].type == 2) {
+						&& terrain[x][(y - 1 + dx) % dx].water > 1 && terrain[x][(y - 1 + dx) % dx].type == LAVE) {
+					
+					if (terrain[x][y].type == EAU) {
 						terrain[x][y].cptLAVA = -1;
-						terrain[x][y].type = 5;
+						terrain[x][y].type = OBSIDIENNE;
 						terrain[x][y].water = 0;
 						terrain[x][(y - 1 + dy) % dy].water--;
 						terrain[x][y].setEvap(-1);
@@ -351,15 +362,16 @@ public class Map {
 					} else {
 						terrain[x][y].water++;
 						terrain[x][(y - 1 + dy) % dy].water--;
-						terrain[x][y].type = 4;
+						terrain[x][y].type = LAVE;
 						terrain[x][y].cptLAVA = 5;
 					}
 
 				} else if (terrain[x][(y + 1) % dy].water > terrain[x][y].water && terrain[x][(y + 1) % dy].water > 1
-						&& terrain[x][(y + 1) % dy].type == 4) {
-					if (terrain[x][y].type == 2) {
+						&& terrain[x][(y + 1) % dy].type == LAVE) {
+					
+					if (terrain[x][y].type == EAU) {
 						terrain[x][y].cptLAVA = -1;
-						terrain[x][y].type = 5;
+						terrain[x][y].type = OBSIDIENNE;
 						terrain[x][y].water = 0;
 						terrain[x][(y + 1) % dy].water--;
 						terrain[x][y].setEvap(-1);
@@ -367,7 +379,7 @@ public class Map {
 					} else {
 						terrain[x][y].water++;
 						terrain[x][(y + 1) % dy].water--;
-						terrain[x][y].type = 4;
+						terrain[x][y].type = LAVE;
 						terrain[x][y].cptLAVA = 5;
 					}
 
@@ -379,6 +391,7 @@ public class Map {
 		}
 	}
 	
+	//lance toutes les fonction gerant la meteo
 	public void meteo() {
 		foudre();
 		pluie();
@@ -404,42 +417,45 @@ public class Map {
 			casesFoudre[1] = y;
 			
 			//met en feu la case qui recoit l'eclair et les cases alentours
-			if (terrain[x][y].isTree && terrain[x][y].type == 0)
+			if (terrain[x][y].isTree && terrain[x][y].type == PLAINE)
 				terrain[x][y].setAFA(1);
 			
-			if (terrain[(x - 1 + dx) % dx][y].isTree && terrain[(x - 1 + dx) % dx][y].type == 0)
+			if (terrain[(x - 1 + dx) % dx][y].isTree && terrain[(x - 1 + dx) % dx][y].type == PLAINE)
 				terrain[(x - 1 + dx) % dx][y].setAFA(1);
 			
-			if (terrain[(x + 1) % dx][y].isTree && terrain[(x + 1) % dx][y].type == 0)
+			if (terrain[(x + 1) % dx][y].isTree && terrain[(x + 1) % dx][y].type == PLAINE)
 				terrain[(x + 1) % dx][y].setAFA(1);
 			
-			if (terrain[x][(y - 1 + dy) % dy].isTree && terrain[x][(y - 1 + dy) % dy].type == 0)
+			if (terrain[x][(y - 1 + dy) % dy].isTree && terrain[x][(y - 1 + dy) % dy].type == PLAINE)
 				terrain[x][(y - 1 + dy) % dy].setAFA(1);
 			
-			if (terrain[x][(y + 1) % dy].isTree && terrain[x][(y + 1) % dy].type == 0)
+			if (terrain[x][(y + 1) % dy].isTree && terrain[x][(y + 1) % dy].type == PLAINE)
 				terrain[x][(y + 1) % dy].setAFA(1);
 		}
 	}
 	
-	//TODO pluie
 	//gere la pluie de la carte
 	public void pluie(){
 		for (int x = 0; x < terrain.length; x++){
 			for (int y = 0; y < terrain[0].length; y++){
 				
-				if (terrain[x][y].type == 2 && terrain[x][y].isPluie())
+				//la pluie ralenti l'evaporation
+				if (terrain[x][y].type == EAU && terrain[x][y].isPluie())
 					terrain[x][y].setEvap(Terrain.EVAP);
 				
-				if (terrain[x][y].isPluie() && terrain[x][y].type == 0 && terrain[x][y].isTree && terrain[x][y].getAFA() == 1)
+				//la pluie eteinds le feu de la case
+				if (terrain[x][y].isPluie() && terrain[x][y].type == PLAINE && terrain[x][y].isTree && terrain[x][y].getAFA() == 1)
 					terrain[x][y].setAFA(0);
 				
-				if(terrain[x][y].type == 2 && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 5){
+				//si la pluie dure longtemps un suplment d'eau apparait
+				if(terrain[x][y].type == EAU && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 5){
 					terrain[x][y].water ++;
 				}
 				
-				if(terrain[x][y].type == 0 && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 10){
+				//si il pleut trop longtemps un lac se forme
+				if(terrain[x][y].type == PLAINE && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 10){
 					terrain[x][y].water ++;
-					terrain[x][y].type = 2;
+					terrain[x][y].type = EAU;
 				}
 				
 				//continue la pluie avec proba de continuer qui diminue a chaque iteration
@@ -449,11 +465,13 @@ public class Map {
 				}
 				
 				//lance la pluie avec une proba definie pas PLUIE
-				if (terrain[x][y].type == 0 && !terrain[x][y].isPluie() && Math.random() < PLUIE){
+				if (terrain[x][y].type == PLAINE && !terrain[x][y].isPluie() && Math.random() < PLUIE){
 					terrain[x][y].setPluie(true);
 					terrain[x][y].setTmpPluie(0);
 				}
-				terrain[x][y].setTmpPluie(terrain[x][y].getTempsPluie() + 1);
+				
+				if (terrain[x][y].isPluie())
+					terrain[x][y].setTmpPluie(terrain[x][y].getTempsPluie() + 1);
 			}
 		}		
 	}
@@ -476,9 +494,9 @@ public class Map {
 						
 					}else{
 						if (x > dx/2 && y > dy/2)
-							terrain[x][y].type = 1;
+							terrain[x][y].type = DESERT;
 						else
-							terrain[x][y].type = 0;
+							terrain[x][y].type = PLAINE;
 						
 						terrain[x][y].water = 0;
 					}
@@ -493,34 +511,34 @@ public class Map {
 		for ( int i = 0 ; i < terrain.length ; i++ ){
 			for ( int j = 0 ; j < terrain[0].length ; j++ ){
 				
-				if (terrain[i][j].type == 0) {
+				if (terrain[i][j].type == PLAINE) {
 					// affiche plaine
 					g2.drawImage(grassSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 
-				} else if (terrain[i][j].type == 1) {
+				} else if (terrain[i][j].type == DESERT) {
 					// affiche desert
 					g2.drawImage(desertSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 
-				} else if (terrain[i][j].type == 2) {
+				} else if (terrain[i][j].type == EAU) {
 					// affiche l eau
 					g2.drawImage(waterSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 
-				} else if (terrain[i][j].type == 3) {
+				} else if (terrain[i][j].type == TERRE) {
 					// affiche la terre
 					g2.drawImage(earthSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 
-				} else if (terrain[i][j].type == 4) {
+				} else if (terrain[i][j].type == LAVE) {
 					// affiche la lave
 					g2.drawImage(lavaSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 
-				} else if (terrain[i][j].type == 5) {
+				} else if (terrain[i][j].type == OBSIDIENNE) {
 					// affiche obsidienne
 					g2.drawImage(obsiSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 
 				}
 
 				if (terrain[i][j].isTree) {
-					if (terrain[i][j].type == 0) {
+					if (terrain[i][j].type == PLAINE) {
 						// affichage arbre
 						if (terrain[i][j].getAFA() == 0) {
 							g2.drawImage(treeSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
@@ -532,7 +550,7 @@ public class Map {
 
 					} else {
 						// affichage des rochers dans le desert
-						if (terrain[i][j].type == 1) {
+						if (terrain[i][j].type == DESERT) {
 							g2.drawImage(rockSprite, spriteLength * i, spriteLength * j, spriteLength, spriteLength, frame);
 						}
 					}

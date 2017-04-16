@@ -47,6 +47,9 @@ public class Terrain {
 		this(0,0,0,false);
 	}
 
+	
+	//Getters and Setters
+	
 	public int getEvap() {
 		return evap;
 	}
