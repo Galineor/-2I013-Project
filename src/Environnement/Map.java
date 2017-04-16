@@ -70,7 +70,7 @@ public class Map {
 				// initialisation du terrain
 				if (Math.random() < (1 - (x * OCEAN)) || Math.random() < (1 - (y * OCEAN))
 						|| Math.random() < (1 - ((dx - x - 1) * OCEAN))
-						|| Math.random() < (1 - ((dy - y - 1) * OCEAN))) {
+						|| Math.random() < (1 - ((dy - y - 1) * OCEAN))){
 					
 					// ajout de la mer autour de l ile
 					terrain[x][y] = new Terrain(2, 2, 0, false);
@@ -437,7 +437,7 @@ public class Map {
 					terrain[x][y].water ++;
 				}
 				
-				if(terrain[x][y].type <= 1 && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 10){
+				if(terrain[x][y].type == 0 && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 10){
 					terrain[x][y].water ++;
 					terrain[x][y].type = 2;
 				}
@@ -449,7 +449,7 @@ public class Map {
 				}
 				
 				//lance la pluie avec une proba definie pas PLUIE
-				if (!terrain[x][y].isPluie() && Math.random() < PLUIE){
+				if (terrain[x][y].type == 0 && !terrain[x][y].isPluie() && Math.random() < PLUIE){
 					terrain[x][y].setPluie(true);
 					terrain[x][y].setTmpPluie(0);
 				}
