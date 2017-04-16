@@ -36,15 +36,15 @@ public class SpriteDemo extends JPanel {
 	public SpriteDemo(){
 		
 		myMap = new Map(tailleX, tailleY);
-		for(int i=0; i< NbDepartLoup; i++){
-			myMap.getAgents().add(new Loup(myMap));
-		}
-		for(int i=0; i< NbDepartMouton; i++){
-			myMap.getAgents().add(new Mouton(myMap));
-		}
-		for(int i=0; i< NbDepartAlligator; i++){
-			myMap.getAgents().add(new Alligator(myMap));
-		}
+//		for(int i=0; i< NbDepartLoup; i++){
+//			myMap.getAgents().add(new Loup(myMap));
+//		}
+//		for(int i=0; i< NbDepartMouton; i++){
+//			myMap.getAgents().add(new Mouton(myMap));
+//		}
+//		for(int i=0; i< NbDepartAlligator; i++){
+//			myMap.getAgents().add(new Alligator(myMap));
+//		}
 			
 		frame = new JFrame("World of Sprite");
 		frame.add(this);

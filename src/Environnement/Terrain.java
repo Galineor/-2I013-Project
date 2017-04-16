@@ -20,7 +20,7 @@ public class Terrain {
 	private int evap = -1; 				//compteur avant evaporation de l'eau de la case
 	private int tempsPluie = -1; 		//compteur de duree de la pluie
 	
-	public final static int	EVAP = 8;	//nombre d'iteration avant evaporation de l'eau 
+	public final static int	EVAP = 10;	//nombre d'iteration avant evaporation de l'eau 
 	
 	//constructeur des case du terrain
 	public Terrain(int type,int water, int alt, boolean tree){

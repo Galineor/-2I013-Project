@@ -48,6 +48,9 @@ public class Map {
 	private final static double LAC = 0.01;  		// 0=>pas d'eau				1=>carte remplie d'eau		par default: 0.01
 	private final static double PLUIE = 0.001; 		// 0=>pas de pluie			1=>100% pluie				par default: 0.001
 	private final static double TEMPS_PLUIE = 0.05; // 0=>pluie sans fin		1=>pluie d'une iteration	par default: 0.05
+	private final static double NOUV_LAC = 0.01;
+	private final static double ADD_WATER = 0.1;
+	private final static double POUR_EVAP = 0.05;
 	
 	//type de terrain
 	private final static int PLAINE = 0;
@@ -448,12 +451,12 @@ public class Map {
 					terrain[x][y].setAFA(0);
 				
 				//si la pluie dure longtemps un suplment d'eau apparait
-				if(terrain[x][y].type == EAU && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 5){
+				if(terrain[x][y].type == EAU && terrain[x][y].isPluie() && Math.random() < ADD_WATER){
 					terrain[x][y].water ++;
 				}
 				
 				//si il pleut trop longtemps un lac se forme
-				if(terrain[x][y].type == PLAINE && terrain[x][y].isPluie() && terrain[x][y].getTempsPluie() > 10){
+				if(terrain[x][y].type == PLAINE && terrain[x][y].isPluie() && Math.random() < NOUV_LAC){
 					terrain[x][y].water ++;
 					terrain[x][y].type = EAU;
 				}
@@ -484,7 +487,7 @@ public class Map {
 			for (int j = 0; j < terrain[0].length/10 ; j ++){
 				x = (int) (Math.random() * dx);
 				y = (int) (Math.random() * dy);
-				if (terrain[x][y].getEvap() > 0){
+				if (terrain[x][y].getEvap() > 0 && Math.random() < POUR_EVAP){
 					terrain[x][y].setEvap(terrain[x][y].getEvap() - 1);
 				}
 				if (terrain[x][y].getEvap() == 0){
