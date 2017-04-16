@@ -20,8 +20,7 @@ public class Loup extends Pred {
 	
 
 	public Loup(Map world) {
-		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
-		super(world, 125, 100);
+		super(world, 250, 251);
 		
 		boolean goodPlacement = false;
 		//Tant qu'il y a de l'eau sur le spawn ou de l'eau qui va se propager a proximite, on change de spawn
@@ -168,10 +167,10 @@ public class Loup extends Pred {
 		for(Agent a : world.getAgents()){
 			if(a instanceof Loup && a.isAlive && !a.equals(this)){
 				//Si un autre Loup se trouve a proximite
-				if(a.getPosX() >= this.posX - 2 && a.getPosX() <= this.posX + 2 &&
-						a.getPosY() >= this.posY - 2 && a.getPosY() <= this.posY + 2){
+				if(a.getPosX() >= this.posX - 3 && a.getPosX() <= this.posX + 3 &&
+						a.getPosY() >= this.posY - 3 && a.getPosY() <= this.posY + 3){
 					if(!this.belongPack){
-						if(a.belongPack && ((Loup)a).pack.groupe.size() < 10){
+						if(a.belongPack && ((Loup)a).pack.groupe.size() < 5){
 							((Loup)a).pack.add(this);
 							this.pack = ((Loup)a).pack;
 							this.belongPack = true;
@@ -185,7 +184,7 @@ public class Loup extends Pred {
 					}
 					//Si il y a 2 petites meutes a proximite, elles fusionnent
 					else if(this.belongPack && a.belongPack && this.pack != ((Loup)a).pack){
-						if(this.pack.groupe.size() + ((Loup)a).pack.groupe.size() < 10){
+						if(this.pack.groupe.size() + ((Loup)a).pack.groupe.size() < 5){
 							for(Loup l : this.pack.groupe){
 								l.pack = ((Loup)a).pack;
 								((Loup)a).pack.add(l);
@@ -277,7 +276,7 @@ public class Loup extends Pred {
 
 	@Override
 	public void comportementAdulte() {
-		int champDeVisionChasse = 4;
+		int champDeVisionChasse = 5;
 		
 		int tempsDeplacement = 12;
 		int tempsRepos = 5;
@@ -285,6 +284,8 @@ public class Loup extends Pred {
 
 		//Le loup se reproduit apres reprodTime iterations
 		if(rt == 0 && belongPack){
+			reproduire();
+			reproduire();
 			reproduire();
 			rt = reprodTime;
 		}

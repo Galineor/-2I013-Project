@@ -21,10 +21,10 @@ public class SpriteDemo extends JPanel {
 	private JFrame frame;
 	
 	public static int spriteLength = 16;
-	private static int delai = 0;
+	private static int delai = 1;
 	
-	private int NbDepartLoup = 40;
-	private int NbDepartMouton = 65;
+	private int NbDepartLoup = 35;
+	private int NbDepartMouton = 80;
 	private int NbDepartAlligator = 20;
 	
 	private int tailleX =40, tailleY = 40;
@@ -91,6 +91,5 @@ public class SpriteDemo extends JPanel {
 		while (true){
 			monSpriteDemo.Step();
 		}
-		
 	}
 }

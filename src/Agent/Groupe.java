@@ -40,6 +40,7 @@ public class Groupe<T extends Agent> {
 	//Quand un membre du groupe mange, il reparti la nourriture entre tous les membres
 	public void repartitionNourriture(){
 		for(T agent : groupe){
+			if(agent.distanceFrom(leader) < 10);
 			agent.setHt(agent.hungerTime/4); 
 		}
 	}

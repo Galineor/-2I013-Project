@@ -20,8 +20,7 @@ public class Alligator extends Pred {
 	private int tempsAttenteProie; // Temps pendant lequel l'agent attendra une proie, s'il mange, le compteur est reinitialise
 	
 	public Alligator(Map world) {
-		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
-		super(world, 125, 200);
+		super(world, 300, 301);
 		initAttributes(this, 0, 0, null);
 		placementDansEau();
 		try{

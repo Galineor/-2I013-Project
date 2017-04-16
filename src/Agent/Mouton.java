@@ -14,8 +14,7 @@ public class Mouton extends Prey {
 	private Groupe<Mouton> troupeau;
 	
 	public Mouton(Map world) {
-		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
-		super(world, 125, 100);
+		super(world, 125, 60);
 		boolean goodPlacement = false;
 		
 		//Tant qu'il y a de l'eau sur le spawn ou de l'eau qui va se propager a proximite, on change de spawn
@@ -298,6 +297,7 @@ public class Mouton extends Prey {
 		int champDeVisionEau = 4;
 		
 		if(rt == 0 && belongPack){
+			reproduire();
 			reproduire();
 			this.setRt(reprodTime);
 		}
