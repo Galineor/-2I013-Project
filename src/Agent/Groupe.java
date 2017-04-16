@@ -37,7 +37,7 @@ public class Groupe<T extends Agent> {
 	//Quand un membre du groupe mange, il reparti la nourriture entre tous les membres
 	public void repartitionNourriture(){
 		for(T agent : groupe){
-			agent.setHt(agent.hungerTime/groupe.size()); 
+			agent.setHt(agent.hungerTime/4); 
 		}
 	}
 }

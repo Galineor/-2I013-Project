@@ -3,7 +3,6 @@ package Agent;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.io.File;
-import java.time.chrono.ChronoPeriod;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -102,7 +101,7 @@ public class Mouton extends Prey {
 				if(a.getPosX() >= this.posX - 2 && a.getPosX() <= this.posX + 2 &&
 						a.getPosY() >= this.posY - 2 && a.getPosY() <= this.posY + 2){
 					if(!this.belongPack){
-						if(a.belongPack){
+						if(a.belongPack && ((Mouton)a).troupeau.groupe.size() < 5){
 							this.troupeau = ((Mouton)a).troupeau;
 							this.belongPack = true;
 						}else if(!a.belongPack){
@@ -115,7 +114,7 @@ public class Mouton extends Prey {
 					}
 					//Si il y a 2 petites meutes a proximite, elles fusionnent
 					else if(this.belongPack && a.belongPack && this.troupeau != ((Mouton)a).troupeau){
-						if(this.troupeau.groupe.size() + ((Mouton)a).troupeau.groupe.size() < 10){
+						if(this.troupeau.groupe.size() + ((Mouton)a).troupeau.groupe.size() < 5){
 							for(Mouton l : this.troupeau.groupe){
 								l.troupeau = ((Mouton)a).troupeau;
 								((Mouton)a).troupeau.add(l);
@@ -224,21 +223,30 @@ public class Mouton extends Prey {
 
 	@Override
 	public void Step() {
-		if(ht == 0){
+		if(ht == 0 || age == ageMort){
 			this.mourir();
 			return;
 		}
 		
+		if(belongPack){
+			System.out.println(this.troupeau.groupe.size());
+		}
 		updatePrevPos();
 		interactEnvironment();
 		manger();
 		gestionPack();
 
-		//TODO Ages
-		comportementAdulte();
+		if(age < ageAdulte){
+			comportementAdulte();
+		}else if(age < ageVieux){
+			comportementAdulte();
+		}else{
+			comportementVieux();
+		}
 		
 		
 		ht--;
+		age++;
 		
 	}
 
@@ -246,10 +254,16 @@ public class Mouton extends Prey {
 	@Override
 	public void comportementJeune() {
 		int champDeVisionFuite = 3;
-		if(parent != null && parent.isAlive() && distanceFrom(parent) < 4){
+		if(parent != null && parent.isAlive()){
 			if(!choixDirectionAvecFuite(champDeVisionFuite)){
 				//Si le mouton n'est pas en danger, il se deplace vers son parent
-				moveToward(parent);				
+				if(distanceFrom(parent) > 2){
+					moveToward(parent);
+				}else{
+					deplacementAleatoire();
+					correctDirection();
+					move(direction, 1);
+				}
 			}else{
 				correctDirection();
 				move(direction, 1);

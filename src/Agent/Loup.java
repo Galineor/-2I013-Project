@@ -21,7 +21,7 @@ public class Loup extends Pred {
 
 	public Loup(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
-		super(world, 125, 200);
+		super(world, 125, 100);
 		
 		boolean goodPlacement = false;
 		//Tant qu'il y a de l'eau sur le spawn ou de l'eau qui va se propager a proximite, on change de spawn
@@ -96,6 +96,7 @@ public class Loup extends Pred {
 	}
 
 	public void reproduire(){
+		System.out.println("Reproduction");
 		rt = reprodTime;
 		for(Agent a : world.getAgents()){
 			if(a instanceof Loup && !a.isAlive){
@@ -152,6 +153,7 @@ public class Loup extends Pred {
 		interactEnvironment();
 		gestionPack();
 		
+	
 		//Si le loup a trop faim, il meurt
 		if(ht <= 0 || age == ageMort){
 			this.mourir();
@@ -175,7 +177,7 @@ public class Loup extends Pred {
 				if(a.getPosX() >= this.posX - 2 && a.getPosX() <= this.posX + 2 &&
 						a.getPosY() >= this.posY - 2 && a.getPosY() <= this.posY + 2){
 					if(!this.belongPack){
-						if(a.belongPack){
+						if(a.belongPack && ((Loup)a).pack.groupe.size() < 10){
 							this.pack = ((Loup)a).pack;
 							this.belongPack = true;
 						}else if(!a.belongPack){
@@ -278,6 +280,7 @@ public class Loup extends Pred {
 		//Le loup se reproduit apres reprodTime iterations
 		if(rt == 0 && belongPack){
 			reproduire();
+			rt = reprodTime;
 		}
 
 
@@ -335,6 +338,12 @@ public class Loup extends Pred {
 		int tempsRepos = 10;
 		int tempsChasse = 4;
 		
+		
+		//Le loup se reproduit apres reprodTime iterations
+		if(rt == 0 && belongPack){
+			reproduire();
+			rt = reprodTime;
+		}
 
 		if(!belongPack || this.pack.leader == this){
 			//On verifie si on peut creer une meute
