@@ -21,7 +21,7 @@ public class SpriteDemo extends JPanel {
 	private JFrame frame;
 	
 	public static int spriteLength = 16;
-	private static int delai = 1;
+	private static int delai = 10;
 	
 	private int NbDepartLoup = 35;
 	private int NbDepartMouton = 80;
