@@ -1,7 +1,6 @@
 package Agent;
 
 import java.util.ArrayList;
-import Environnement.*;
 
 public class Groupe<T extends Agent> {
 	
@@ -23,13 +22,20 @@ public class Groupe<T extends Agent> {
 		if(leader.isAlive){
 			return leader;
 		}
+		if(groupe.size() == 1){
+			//Il ne reste qu'un membre donc il n'est plus en meute
+			groupe.get(0).quitterGroupe();
+			return null;
+		}
 		if(groupe.size() == 0){
-			//La liste est vide, donc cette meute est morte
 			return null;
 		}
 		
-		//Si le leader est mort
+		//Si le leader est mort, on le change
 		leader = groupe.get(0);
+		if(!leader.isAlive){
+			System.out.println("Et encore DAFUCK");
+		}
 		return leader;
 	}
 	
