@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import Environnement.Map;
-import Sprite.SpriteDemo;
 
 public class Alligator extends Pred {
 	
@@ -16,6 +15,9 @@ public class Alligator extends Pred {
 	private boolean returningToWater;
 	private int posAvantChasseX;
 	private int posAvantChasseY;
+	
+	private int cptDeplacement; // Compteur pour la phase de deplacement
+	private int tempsAttenteProie; // Temps pendant lequel l'agent attendra une proie, s'il mange, le compteur est reinitialise
 	
 	public Alligator(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
@@ -39,7 +41,6 @@ public class Alligator extends Pred {
 		a.setAlive(true);
 		a.setPosX(x);
 		a.setPosY(y);
-		a.champDeVision = 2;
 		a.setRt(reprodTime);
 		a.setHt(hungerTime);
 		a.direction = (int)(Math.random()*4);
@@ -50,6 +51,9 @@ public class Alligator extends Pred {
 		a.setPrevPosY(-1);
 		a.isOnFire = false;
 		((Alligator)a).returningToWater = false;
+		((Alligator)a).tempsAttenteProie = 0;
+		((Alligator)a).cptDeplacement = 0;
+		
 	}
 	
 	public void placementDansEau(){
@@ -65,14 +69,14 @@ public class Alligator extends Pred {
 		this.setPosY(y);
 	}
 	
-	public void afficher(Graphics2D g2, JFrame frame){
+	public void afficher(Graphics2D g2, JFrame frame, int spriteLength){
 		if(getSpritePosX() == -1 || getSpritePosY() == -1){
-			this.spritePosX = this.posX * SpriteDemo.spriteLength;
-			this.spritePosY = this.posY * SpriteDemo.spriteLength;
+			this.spritePosX = this.posX * spriteLength;
+			this.spritePosY = this.posY * spriteLength;
 		}
-		g2.drawImage(alligatorSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		g2.drawImage(alligatorSprite, this.getSpritePosX(), this.getSpritePosY(), spriteLength, spriteLength, frame);
 		if(isOnFire){
-			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), spriteLength, spriteLength, frame);
 		}
 	}
 
@@ -89,12 +93,6 @@ public class Alligator extends Pred {
 			this.mourir();
 			return;
 		}
-		
-		//TODO Comportement des loups : 
-		//	Restent pres de l'eau
-		// 	Mange les animaux qui s'approche
-		// 	Longue duree de vie
-		
 		
 		if(age<ageAdulte){
 			comportementJeune();
@@ -122,12 +120,11 @@ public class Alligator extends Pred {
 
 	@Override
 	public void mourir() {
-		// TODO Auto-generated method stub
 		this.setAlive(false);
 		
 	}
 	
-	public void chasse(){
+	public void chasse(int champDeVision){
 		//Si proie proche, l'alligator se precipite dessus
 		for(Agent a : world.getAgents()){
 			if(!a.isPred && a.isAlive() && !a.estCache){
@@ -141,6 +138,7 @@ public class Alligator extends Pred {
 					moveTo(a.posX, a.posY);
 					manger();
 					
+					tempsAttenteProie = 0;
 					this.returningToWater = true;
 					return;
 				}
@@ -197,7 +195,48 @@ public class Alligator extends Pred {
 
 	@Override
 	public void comportementAdulte() {
+		int champDeVisionChasse = 3;
+		int tempsDeplacement = 5;
+		int tempsAttente = 20;
 		// Quand ils sont adultes, ils cherhent une rive sur laquelle attendre pour chasser
+		
+		if(this.returningToWater){
+			//Si on est de retour a la position d'avant chasse, on peut reprendre le cycle normal
+			if(this.posAvantChasseX == this.posX && this.posAvantChasseY == this.posY){
+				returningToWater = false;
+			}
+			//Sinon on continue de se deplacer vers cette position
+			else{
+				moveToward(posAvantChasseX, posAvantChasseY, false);
+			}
+		}
+		
+		if(tempsAttenteProie > tempsAttente){
+			cptDeplacement = tempsDeplacement;
+			tempsAttenteProie = 0;
+		}	
+		
+		if(!returningToWater){
+			tempsAttenteProie++;
+			chasse(champDeVisionChasse);
+		}
+		
+		//Si on est a cote d'une rive, on ne bouge pas
+		if((!returningToWater && !RiveProche()) || cptDeplacement > 0){
+			deplacementAleatoire();
+			correctDirection();
+			move(direction, 1);
+		}
+		
+		if(cptDeplacement > 0){
+			cptDeplacement--;
+		}
+		
+	}
+
+	@Override
+	public void comportementVieux() {
+		int champDeVisionChasse = 2;
 		
 		if(this.returningToWater){
 			//Si on est de retour a la position d'avant chasse, on peut reprendre le cycle normal
@@ -212,7 +251,7 @@ public class Alligator extends Pred {
 		
 		
 		if(!returningToWater){
-			chasse();
+			chasse(champDeVisionChasse);
 		}
 		
 		//Si on est a cote d'une rive, on ne bouge pas
@@ -220,12 +259,6 @@ public class Alligator extends Pred {
 			correctDirection();
 			move(direction, 1);
 		}
-		
-	}
-
-	@Override
-	public void comportementVieux() {
-		// TODO Auto-generated method stub
 		
 	}
 

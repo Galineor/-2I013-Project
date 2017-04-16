@@ -8,33 +8,35 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import Environnement.*;
-import Sprite.SpriteDemo;
 
 public class Mouton extends Prey {
 	private Image moutonSprite;
-	
+	private Groupe<Mouton> troupeau;
 	
 	public Mouton(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()));
-		super(world, 125, 200);
-		int x = -1 ,y = -1;
+		super(world, 125, 100);
 		boolean goodPlacement = false;
 		
 		//Tant qu'il y a de l'eau sur le spawn ou de l'eau qui va se propager a proximite, on change de spawn
 		while(!goodPlacement){
-			x = (int)(Math.random()*world.getWidth());
-			y = (int)(Math.random()*world.getHeight());
+			posX = (int)(Math.random()*world.getWidth());
+			posY = (int)(Math.random()*world.getHeight());
 			
 			goodPlacement = true;
 			
 			// S'il y a de l'eau a proximite, on considere que c'est une mauvaise position de spawn
-			if(world.getTerrain()[x][y].type == 2 || world.getTerrain()[x+1][y].type == 2 || world.getTerrain()[x-1][y].type == 2 ||
-					world.getTerrain()[x][y+1].type == 2|| world.getTerrain()[x][y-1].type == 2 ){
+			
+			if(world.getTerrain()[posX][posY].type == 2 
+					|| (!isOutBoundsDirection(EST) && world.getTerrain()[posX+1][posY].type == 2) 
+					|| (!isOutBoundsDirection(OUEST) && world.getTerrain()[posX-1][posY].type == 2) ||
+					(!isOutBoundsDirection(SUD) && world.getTerrain()[posX][posY+1].type == 2) ||
+					(!isOutBoundsDirection(NORD) &&  world.getTerrain()[posX][posY-1].type == 2 )){
 				goodPlacement = false;
 			}
 			
 		}
-		initAttributes(this, x, y, null);
+		initAttributes(this, posX, posY, null);
 		
 		try{
 			moutonSprite = ImageIO.read(new File("src/sheep.png"));
@@ -54,7 +56,6 @@ public class Mouton extends Prey {
 		a.setAlive(true);
 		a.setPosX(x);
 		a.setPosY(y);
-		a.champDeVision = 3;
 		a.setRt(reprodTime);
 		a.setHt(hungerTime);
 		a.direction = (int)(Math.random()*4);
@@ -63,16 +64,18 @@ public class Mouton extends Prey {
 		a.setPrevPosX(-1);
 		a.setPrevPosY(-1);
 		a.isOnFire = false;
+		a.belongPack = false;
+		((Mouton)a).troupeau = null;
 	}
 	
-	public void afficher(Graphics2D g2, JFrame frame){
+	public void afficher(Graphics2D g2, JFrame frame, int spriteLength){
 		if(getSpritePosX() == -1 || getSpritePosY() == -1){
-			this.spritePosX = this.posX * SpriteDemo.spriteLength;
-			this.spritePosY = this.posY * SpriteDemo.spriteLength;
+			this.spritePosX = this.posX * spriteLength;
+			this.spritePosY = this.posY * spriteLength;
 		}
-		g2.drawImage(moutonSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		g2.drawImage(moutonSprite, this.getSpritePosX(), this.getSpritePosY(), spriteLength, spriteLength, frame);
 		if(isOnFire){
-			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), spriteLength, spriteLength, frame);
 		}
 	}
 	
@@ -81,7 +84,7 @@ public class Mouton extends Prey {
 		int pousse;
 		
 		//Si le mouton a faim
-		if(ht <= hungerTime/2){
+		if(ht <= hungerTime/4){
 			//Alors il mange s'il y a de l'herbe sous ses pieds
 			pousse = world.getTerrain()[posX][posY].getPousse();
 			if(pousse>=5){
@@ -91,13 +94,47 @@ public class Mouton extends Prey {
 		}
 	}
 	
+	public void gestionPack(){
+		for(Agent a : world.getAgents()){
+			if(a instanceof Mouton && a.isAlive && !a.equals(this)){
+				//Si un autre Mouton se trouve a proximite
+				if(a.getPosX() >= this.posX - 2 && a.getPosX() <= this.posX + 2 &&
+						a.getPosY() >= this.posY - 2 && a.getPosY() <= this.posY + 2){
+					if(!this.belongPack){
+						if(a.belongPack && ((Mouton)a).troupeau.groupe.size() < 5){
+							this.troupeau = ((Mouton)a).troupeau;
+							this.belongPack = true;
+						}else if(!a.belongPack){
+							this.troupeau = new Groupe<Mouton>(this);
+							this.troupeau.add((Mouton)a);
+							this.belongPack = true;
+							((Mouton)a).troupeau = this.troupeau;
+							a.belongPack = true;
+						}
+					}
+					//Si il y a 2 petites meutes a proximite, elles fusionnent
+					else if(this.belongPack && a.belongPack && this.troupeau != ((Mouton)a).troupeau){
+						if(this.troupeau.groupe.size() + ((Mouton)a).troupeau.groupe.size() < 5){
+							for(Mouton l : this.troupeau.groupe){
+								l.troupeau = ((Mouton)a).troupeau;
+								((Mouton)a).troupeau.add(l);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	
 	//Regarde les alentours de la proie et engage la fuite de la proe vers une zone (peut etre) safe
-	public void fuite(){
+	// Retourne true si un predateur visible se trouve a proximite
+	public boolean choixDirectionAvecFuite(int champDeVision){
 		//Algo de fuite
 		
 		//On utilise un tableau de boolean pour connaitres les directions de fuites possibles
 		//On parcourt la liste des agents afin de voir ou sont les predateurs et de bloquer ces directions dans le tableau
+		boolean danger = false;
 		
 		boolean directionPossible[] = new boolean[4];
 		for(int i=0; i<4; i++){
@@ -116,24 +153,28 @@ public class Mouton extends Prey {
 			if(a.getPosX() <= this.posX - 1 && a.getPosX() >= this.posX-champDeVision && a.getPosY() >= this.posY - champDeVision
 					&& a.getPosY() <= this.posY + champDeVision){
 				directionPossible[3] = false;
+				danger = true;
 			}
 			
 			//Bloc droit
 			if(a.getPosX() >= this.posX +1 && a.getPosX() <= this.posX+champDeVision && a.getPosY() >= this.posY - champDeVision
 					&& a.getPosY() <= this.posY + champDeVision){
 				directionPossible[1] = false;
+				danger = true;
 			}
 			
 			//Bloc haut
 			if(a.getPosX() >= this.posX - champDeVision && a.getPosX() <= this.posX+champDeVision && a.getPosY() <= this.posY - 1
 					&& a.getPosY() >= this.posY - champDeVision){
 				directionPossible[0] = false;
+				danger = true;
 			}
 			
 			//Bloc bas
 			if(a.getPosX() >= this.posX - champDeVision && a.getPosX() <= this.posX+champDeVision && a.getPosY() >= this.posY + 1
 					&& a.getPosY() <= this.posY + champDeVision){
 				directionPossible[2] = false;
+				danger = true;
 			}
 		}
 		
@@ -143,7 +184,7 @@ public class Mouton extends Prey {
 		while(cpt < 4){
 			if(directionPossible[alea]){
 				this.direction = alea;
-				return;
+				return danger;
 			}
 			alea = (alea+1)%4;
 			cpt++;
@@ -151,6 +192,7 @@ public class Mouton extends Prey {
 		
 		//Le mouton ne peut aller nul part...
 		this.direction = 0;
+		return danger;
 	}
 	
 	public void reproduire(){
@@ -166,49 +208,149 @@ public class Mouton extends Prey {
 	
 	public void mourir(){
 		this.setAlive(false);
+		if(this.belongPack){
+			//On supprime les agents qui meurent de la meute
+			this.troupeau.groupe.remove(this);
+			if(this.troupeau.groupe.size() == 1){
+				this.troupeau.groupe.get(0).belongPack = false;
+				this.troupeau.groupe.get(0).troupeau = null;
+				return;
+			}
+			this.troupeau.updateLeader();
+
+		}
 	}
 
 	@Override
 	public void Step() {
-		updatePrevPos();
-		interactEnvironment();
-		manger();
-		
-		//TODO Comportements selon l'age
-		deplacementAleatoire();
-		
-		if(rt == 0){
-			reproduire();
-		}
-		
-		if(ht == 0){
+		if(ht == 0 || age == ageMort){
 			this.mourir();
 			return;
 		}
-		fuite(); //Fuis si besoin
-		correctDirection();		
-		move(direction, 1);
-		rt--;
+		
+		if(belongPack){
+			System.out.println(this.troupeau.groupe.size());
+		}
+		updatePrevPos();
+		interactEnvironment();
+		manger();
+		gestionPack();
+
+		if(age < ageAdulte){
+			comportementAdulte();
+		}else if(age < ageVieux){
+			comportementAdulte();
+		}else{
+			comportementVieux();
+		}
+		
+		
 		ht--;
+		age++;
 		
 	}
 
 
 	@Override
 	public void comportementJeune() {
-		// TODO Auto-generated method stub
+		int champDeVisionFuite = 3;
+		if(parent != null && parent.isAlive()){
+			if(!choixDirectionAvecFuite(champDeVisionFuite)){
+				//Si le mouton n'est pas en danger, il se deplace vers son parent
+				if(distanceFrom(parent) > 2){
+					moveToward(parent);
+				}else{
+					deplacementAleatoire();
+					correctDirection();
+					move(direction, 1);
+				}
+			}else{
+				correctDirection();
+				move(direction, 1);
+			}
+		}else if(belongPack && this.troupeau.leader != this){
+			if(choixDirectionAvecFuite(champDeVisionFuite)){
+				correctDirection();
+				move(direction, 1);
+			}
+			else if(distanceFrom(troupeau.leader) > 2){
+				moveToward(troupeau.leader);
+			}
+		}else{
+			choixDirectionAvecFuite(champDeVisionFuite);
+			correctDirection();
+			move(direction, 1);
+		}
 		
+		//Si le parent est mort on le passe a null
+		if(parent != null && !parent.isAlive()){
+			parent = null;
+		}
 	}
 
 	@Override
 	public void comportementAdulte() {
-		// TODO Auto-generated method stub
+		int champDeVisionFuite = 3;
+		
+		if(rt == 0 && belongPack){
+			reproduire();
+			this.setRt(reprodTime);
+		}
+		
+		if(!belongPack || this.troupeau.leader == this){
+			choixDirectionAvecFuite(champDeVisionFuite); //Fuis si besoin
+			correctDirection();		
+			move(direction, 1);
+		}
+		
+		else{
+			if(choixDirectionAvecFuite(champDeVisionFuite)){
+				correctDirection();
+				move(direction, 1);
+			}else{
+				if(distanceFrom(troupeau.leader) > 2){
+					moveToward(troupeau.leader);
+				}
+			}
+		}
+	
+
+		if(belongPack){
+			rt--;
+		}
 		
 	}
 
 	@Override
 	public void comportementVieux() {
-		// TODO Auto-generated method stub
 		
+		int champDeVisionFuite = (int)(Math.random()*2)+1;
+		
+		if(rt == 0 && belongPack){
+			reproduire();
+			this.setRt(reprodTime);
+		}
+		
+		if(!belongPack || this.troupeau.leader == this){
+			choixDirectionAvecFuite(champDeVisionFuite); //Fuis si besoin
+			correctDirection();		
+			move(direction, 1);
+		}
+		
+		else{
+			if(choixDirectionAvecFuite(champDeVisionFuite)){
+				correctDirection();
+				move(direction, 1);
+			}else{
+				if(distanceFrom(troupeau.leader) > 2){
+					moveToward(troupeau.leader);
+				}
+			}
+		}
+	
+
+		if(belongPack){
+			rt--;
+		}
 	}
 }

@@ -46,16 +46,15 @@ public abstract class Agent {
 	protected int ageVieux;
 	protected int ageMort; // Age auxquels l'agent est trop vieux pour continuer a vivre
 	
-	protected int champDeVision;
-	
 	protected boolean estCache; //Indique si l'agent est detectable par les autres agents
 	
 	protected boolean isOnFire;
 	protected int cptOnFire; // Les agents meurent apres quelques iterations
 	protected Image fireSprite;
+	
+	protected Image sleepSprite;
 
 	public Agent(Map world, int hungerTime, int reprodTime){
-		this.direction = 0;
 		this.isAlive = true;
 		this.world = world;
 		this.spritePosX = this.spritePosY = -1;
@@ -70,6 +69,7 @@ public abstract class Agent {
 		
 		try{
 			fireSprite = ImageIO.read(new File("src/fire.png"));
+			sleepSprite = ImageIO.read(new File("src/sleep.png"));
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -112,11 +112,12 @@ public abstract class Agent {
 	
 	public void deplacementAleatoire(){
 		//Si pas de direction, on en choisie une aleatoire
-		if(direction == -1){
+		if(direction == NO_MOVE){
 			direction = (int)(Math.random()*4);
 			return;
 		}
 		
+		//Sinon on a une chance de garder la direction actuelle ou de tourner a gauche ou droite
 		if(Math.random() < 0.3){
 			if ( Math.random() > 0.5 ) // au hasard
 				direction = (direction+1) %4;
@@ -211,7 +212,7 @@ public abstract class Agent {
 			}
 			
 			// L'agent ne peut bouger dans aucune direction
-			direction = -1;
+			direction = NO_MOVE;
 		}
 	}
 	
@@ -238,6 +239,37 @@ public abstract class Agent {
 			break;
 		case OUEST:
 			if(world.getTerrain()[posX - 1][posY].type == 2){
+				return true;
+			}
+			break;
+		}
+		
+		return false;
+	}
+	
+	public boolean isWater(int direction, int distance){
+		if(direction == -1){
+			return world.getTerrain()[posX][posY].type == 2;
+		}
+		
+		switch(direction){
+		case NORD:
+			if(world.getTerrain()[posX][posY - distance].type == 2){
+				return true;
+			}
+			break;
+		case EST:
+			if(world.getTerrain()[posX + distance][posY].type== 2){
+				return true;
+			}
+			break;
+		case SUD:
+			if(world.getTerrain()[posX][posY + distance].type == 2){
+				return true;
+			}
+			break;
+		case OUEST:
+			if(world.getTerrain()[posX - distance][posY].type == 2){
 				return true;
 			}
 			break;
@@ -362,7 +394,7 @@ public abstract class Agent {
 		}
 	}
 	
-	public abstract void afficher(Graphics2D g2, JFrame frame);
+	public abstract void afficher(Graphics2D g2, JFrame frame, int spriteLength);
 	
 	public abstract void mourir();
 
