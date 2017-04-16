@@ -22,7 +22,7 @@ public class SpriteDemo extends JPanel {
 	private JFrame frame;
 	
 	public static int spriteLength = 16;
-	private static int delai = 20;
+	private static int delai = 10;
 	
 	private int NbDepartLoup = 20;
 	private int NbDepartMouton = 65;
@@ -66,7 +66,7 @@ public class SpriteDemo extends JPanel {
 		cloneAgent = new ArrayList<Agent>(myMap.getAgents());
 		for(Agent a : cloneAgent){
 			if(a.isAlive()){
-				a.afficher(g2, frame);
+				a.afficher(g2, frame,spriteLength);
 			}
 		}
 	}

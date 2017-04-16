@@ -32,4 +32,12 @@ public class Groupe<T extends Agent> {
 		leader = groupe.get(0);
 		return leader;
 	}
+	
+	
+	//Quand un membre du groupe mange, il reparti la nourriture entre tous les membres
+	public void repartitionNourriture(){
+		for(T agent : groupe){
+			agent.setHt(agent.hungerTime/groupe.size()); 
+		}
+	}
 }

@@ -8,13 +8,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import Environnement.*;
-import Sprite.SpriteDemo;
 
 public class Loup extends Pred {
-
-	public final int deplacement = 20;
-	public final int repos = 5;
-	public final int chasse = 15;
 
 	private int cptDeplacement;
 	private int cptRepos;
@@ -22,19 +17,32 @@ public class Loup extends Pred {
 	protected Groupe<Loup> pack;
 
 	private Image loupSprite;
+	
 
 	public Loup(Map world) {
 		//this(world, (int)(Math.random()*world.getWidth()),(int)(Math.random()*world.getHeight()) );
 		super(world, 125, 200);
-		int x = (int)(Math.random()*world.getWidth());
-		int y = (int)(Math.random()*world.getHeight());
-
-		//Tant qu'il y a de l'eau sur le spawn, on change de spawn
-		while(world.getTerrain()[x][y].type == 2){
-			x = (int)(Math.random()*world.getWidth());
-			y = (int)(Math.random()*world.getHeight());
-		}
-		initAttributes(this, x, y, null);
+		
+		boolean goodPlacement = false;
+		//Tant qu'il y a de l'eau sur le spawn ou de l'eau qui va se propager a proximite, on change de spawn
+				while(!goodPlacement){
+					posX = (int)(Math.random()*world.getWidth());
+					posY = (int)(Math.random()*world.getHeight());
+					
+					goodPlacement = true;
+					
+					// S'il y a de l'eau a proximite, on considere que c'est une mauvaise position de spawn
+					
+					if(world.getTerrain()[posX][posY].type == 2 
+							|| (!isOutBoundsDirection(EST) && world.getTerrain()[posX+1][posY].type == 2) 
+							|| (!isOutBoundsDirection(OUEST) && world.getTerrain()[posX-1][posY].type == 2) ||
+							(!isOutBoundsDirection(SUD) && world.getTerrain()[posX][posY+1].type == 2) ||
+							(!isOutBoundsDirection(NORD) &&  world.getTerrain()[posX][posY-1].type == 2 )){
+						goodPlacement = false;
+					}
+					
+				}
+		initAttributes(this, posX, posY, null);
 
 		try{
 			loupSprite = ImageIO.read(new File("src/wolf.png"));
@@ -62,7 +70,7 @@ public class Loup extends Pred {
 		a.setPrevPosY(-1);
 		a.belongPack = false;
 		a.isOnFire = false;
-		((Loup)a).cptDeplacement = deplacement;
+		((Loup)a).cptDeplacement = 0;
 		((Loup)a).cptRepos = 0;
 		((Loup)a).cptChasse = 0;
 		((Loup)a).pack = null;
@@ -70,14 +78,20 @@ public class Loup extends Pred {
 		
 	}
 
-	public void afficher(Graphics2D g2, JFrame frame){
+	public void afficher(Graphics2D g2, JFrame frame, int spriteLength){
 		if(getSpritePosX() == -1 || getSpritePosY() == -1){
-			this.spritePosX = this.posX * SpriteDemo.spriteLength;
-			this.spritePosY = this.posY * SpriteDemo.spriteLength;
+			this.spritePosX = this.posX * spriteLength;
+			this.spritePosY = this.posY * spriteLength;
 		}
-		g2.drawImage(loupSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+		
+		g2.drawImage(loupSprite, this.getSpritePosX(), this.getSpritePosY(), spriteLength, spriteLength, frame);
 		if(isOnFire){
-			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(), SpriteDemo.spriteLength, SpriteDemo.spriteLength, frame);
+			g2.drawImage(fireSprite, this.getSpritePosX(), this.getSpritePosY(),spriteLength, spriteLength, frame);
+		}
+		
+		//Si on est en phase de repos
+		if(cptRepos > 0){
+			g2.drawImage(sleepSprite, this.getSpritePosX(), this.getSpritePosY(), spriteLength, spriteLength, frame);
 		}
 	}
 
@@ -92,23 +106,23 @@ public class Loup extends Pred {
 		world.toAdd.add(new Loup(world, this.posX, this.posY));
 	}
 
-	public void chasser(){
+	public void chasser(int champDeVision){
 		isChasing = false;
 		for(Agent a : world.getAgents()){
 			if(!a.isPred && a.isAlive() && !a.estCache){
-				if(a.posY >= this.posY - 4 && a.posY<=this.posY && a.posX == this.posX){
+				if(a.posY >= this.posY - champDeVision && a.posY<=this.posY && a.posX == this.posX){
 					this.direction = 0;
 					isChasing = true;
 				}
-				if(a.posX <= this.posX + 4 && a.posX>=this.posX && a.posY == this.posY){
+				if(a.posX <= this.posX + champDeVision && a.posX>=this.posX && a.posY == this.posY){
 					this.direction = 1;
 					isChasing = true;
 				}
-				if(a.posY <= this.posY + 4 && a.posY>=this.posY && a.posX == this.posX){
+				if(a.posY <= this.posY + champDeVision && a.posY>=this.posY && a.posX == this.posX){
 					this.direction = 2;			
 					isChasing = true;
 				}
-				if(a.posX >= this.posX - 4 && a.posX<=this.posX && a.posY == this.posY){
+				if(a.posX >= this.posX - champDeVision && a.posX<=this.posX && a.posY == this.posY){
 					this.direction = 3;
 					isChasing = true;
 				}
@@ -136,6 +150,7 @@ public class Loup extends Pred {
 	public void Step() {
 		updatePrevPos();
 		interactEnvironment();
+		gestionPack();
 		
 		//Si le loup a trop faim, il meurt
 		if(ht <= 0 || age == ageMort){
@@ -149,7 +164,6 @@ public class Loup extends Pred {
 		}else{
 			comportementVieux();
 		}
-
 		age++;
 	}
 
@@ -185,17 +199,57 @@ public class Loup extends Pred {
 			}
 		}
 	}
+	
+	public void arbreDeComportement(int tempsDeplacement, int tempsRepos, int tempsChasse){
+		//Si l'arbre de comportement n'est initialise a aucune valeur, on lui indique de commencer la phase de deplacement
+		if(cptDeplacement == 0 && cptRepos == 0 && cptChasse == 0){
+			cptDeplacement = tempsDeplacement;
+			return;
+		}
+		
+		
+		//Si l'agent phase deplacement
+		if(cptDeplacement > 0){
+			cptDeplacement--;
+			//S'il est entrain de chasser
+			if(isChasing){
+				//On passe en phase de chasse
+				cptDeplacement = 0;
+				cptChasse = tempsChasse;
+			}else{
+				//S'il n'est pas entrain de chasser et que la phase de deplacement est finie, on passe en repos
+				if(cptDeplacement == 0){
+					cptRepos = tempsRepos;
+				}
+			}
+		}
+		//Si l'agent est en phase de repos
+		else if(cptRepos > 0){
+			cptRepos--;
+			if(cptRepos == 0){
+				cptDeplacement = tempsDeplacement;
+			}
+		}
+		//Si s'il en phase de chasse et qu'il a toujours une proie en vue
+		else if(cptChasse > 0 && isChasing){
+			cptChasse--;
+			//Si la phase de chasse est fini, l'agent doit se reposer
+			if(cptChasse == 0){
+				cptRepos = tempsRepos;
+			}
+		}
+		
+		//Si l'agent est en phase de chasse mais qu'il n'a plus de proie en vue
+		else if(cptChasse > 0 && !isChasing){
+			//On arrete la chasse et on relance une phase de deplacement
+			cptChasse = 0;
+			cptDeplacement = tempsDeplacement;
+		}
+	}
 
 
 	@Override
 	public void comportementJeune() {
-
-		/* 
-		 * Suit le parent
-		 * Pas necessaire de manger
-		 * Pas de reproduction
-		 * Endurance forte
-		 */
 
 		//S'il y a un parent : on le suit
 		if(parent != null && parent.isAlive()){
@@ -203,9 +257,9 @@ public class Loup extends Pred {
 		}
 		//Si pas de parents, le louveteau devient adulte
 		else{
+			parent = null;
 			age = ageAdulte;
 			comportementAdulte();
-			this.cptDeplacement = deplacement;
 		}
 
 
@@ -215,68 +269,50 @@ public class Loup extends Pred {
 
 	@Override
 	public void comportementAdulte() {
-		/*
-		 * Chasse
-		 * Reproduction
-		 * Comportement en meute
-		 * Endurance normale
-		 */
-
-		//On essaie de manger avant de se deplacer
-		manger();
+		int champDeVisionChasse = 4;
+		
+		int tempsDeplacement = 12;
+		int tempsRepos = 5;
+		int tempsChasse = 7;
 
 		//Le loup se reproduit apres reprodTime iterations
-		if(rt == 0){
+		if(rt == 0 && belongPack){
 			reproduire();
 		}
 
-		gestionPack();
 
-		if(!belongPack || (this.belongPack && this.pack.leader == this)){
+		if(!belongPack || this.pack.leader == this){
 			//On verifie si on peut creer une meute
 
-			//Si on n'appatient pas a une meute, on regarde si on peut en creer une
-
-
-			//Arbre de comportement
+		
+			arbreDeComportement(tempsDeplacement, tempsRepos, tempsChasse);
+			
 			if(cptDeplacement > 0){
-				cptDeplacement--;
-				chasser();
+				//On essaie de chasser
+				chasser(champDeVisionChasse);
+				
+				//Si on a pas trouve de proie, on se deplace aleatoirement
 				if(!isChasing){
 					deplacementAleatoire();
-					if(cptDeplacement == 0){
-						cptRepos = repos;
-					}
-				}else{
-					cptChasse = chasse;
-					cptDeplacement = 0;
 				}
 			}else if(cptRepos > 0){
-				cptRepos--;
-				chasser();
+				direction = NO_MOVE;
+			}else if(cptChasse > 0){
+				chasser(champDeVisionChasse);
+				
+				//Si l'agent a perdu la proie de vue, il se deplace aleatoirement
 				if(!isChasing){
-					direction = -1;
-					if(cptRepos == 0){
-						cptDeplacement = deplacement;
-					}
-				}else{
-					cptChasse = chasse;
-					cptRepos = 0;
+					deplacementAleatoire();
 				}
 			}
-			if(isChasing && cptChasse > 0){
-				cptChasse--;
-			}else if(isChasing && cptChasse == 0){
-				isChasing = false;
-				cptDeplacement = deplacement;
-			}else if(!isChasing && cptChasse > 0){
-				cptChasse = 0;
-				cptDeplacement = deplacement;
-			}
 
-			chasser();
 			correctDirection(); //Permet de corriger la direction si le deplacement n'est pas possible dans la direction actuelle
 			move(direction, 1);
+			
+			//Si l'agent est entrain de chasser, on essaie de manger apres le deplacement
+			if(isChasing){
+				manger(); //Si l'a proie n'est pas sur la case actuelle, rien ne se passe
+			}
 		}
 		else if(belongPack){
 			if(distanceFrom(this.pack.leader) > 2){
@@ -284,24 +320,64 @@ public class Loup extends Pred {
 			}
 		}
 
-
-
-
-		//On essaie de manger apres le deplacemnt
-		manger();
-
 		ht--;
-		rt--;
+		if(belongPack){
+			rt--;
+		}
 	}
 
 
 	@Override
 	public void comportementVieux() {
+		int champDeVisionChasse = 2;
+		
+		int tempsDeplacement = 10;
+		int tempsRepos = 10;
+		int tempsChasse = 4;
+		
 
-		/*
-		 * Moins d'endurance
-		 * Plus petit champ de vision
-		 * 
-		 */
+		if(!belongPack || this.pack.leader == this){
+			//On verifie si on peut creer une meute
+
+		
+			arbreDeComportement(tempsDeplacement, tempsRepos, tempsChasse);
+			
+			if(cptDeplacement > 0){
+				//On essaie de chasser
+				chasser(champDeVisionChasse);
+				
+				//Si on a pas trouve de proie, on se deplace aleatoirement
+				if(!isChasing){
+					deplacementAleatoire();
+				}
+			}else if(cptRepos > 0){
+				direction = NO_MOVE;
+			}else if(cptChasse > 0){
+				chasser(champDeVisionChasse);
+				
+				//Si l'agent a perdu la proie de vue, il se deplace aleatoirement
+				if(!isChasing){
+					deplacementAleatoire();
+				}
+			}
+
+			correctDirection(); //Permet de corriger la direction si le deplacement n'est pas possible dans la direction actuelle
+			move(direction, 1);
+			
+			//Si l'agent est entrain de chasser, on essaie de manger apres le deplacement
+			if(isChasing){
+				manger(); //Si l'a proie n'est pas sur la case actuelle, rien ne se passe
+			}
+		}
+		else if(belongPack){
+			if(distanceFrom(this.pack.leader) > 2){
+				moveToward(this.pack.leader);
+			}
+		}
+
+		ht--;
+		if(belongPack){
+			rt--;
+		}
 	}
 }
