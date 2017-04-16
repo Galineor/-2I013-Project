@@ -223,22 +223,22 @@ public abstract class Agent {
 		
 		switch(d){
 		case NORD:
-			if(world.getTerrain()[posX][posY - 1].type == 2){
+			if(world.getTerrain()[posX][posY - 1].type == Map.EAU){
 				return true;
 			}
 			break;
 		case EST:
-			if(world.getTerrain()[posX + 1][posY].type== 2){
+			if(world.getTerrain()[posX + 1][posY].type== Map.EAU){
 				return true;
 			}
 			break;
 		case SUD:
-			if(world.getTerrain()[posX][posY + 1].type == 2){
+			if(world.getTerrain()[posX][posY + 1].type == Map.EAU){
 				return true;
 			}
 			break;
 		case OUEST:
-			if(world.getTerrain()[posX - 1][posY].type == 2){
+			if(world.getTerrain()[posX - 1][posY].type == Map.EAU){
 				return true;
 			}
 			break;
@@ -249,27 +249,27 @@ public abstract class Agent {
 	
 	public boolean isWater(int direction, int distance){
 		if(direction == -1){
-			return world.getTerrain()[posX][posY].type == 2;
+			return world.getTerrain()[posX][posY].type == Map.EAU;
 		}
 		
 		switch(direction){
 		case NORD:
-			if(world.getTerrain()[posX][posY - distance].type == 2){
+			if(world.getTerrain()[posX][Math.max(posY - distance, 0)].type == Map.EAU){
 				return true;
 			}
 			break;
 		case EST:
-			if(world.getTerrain()[posX + distance][posY].type== 2){
+			if(world.getTerrain()[Math.min(posX + distance, world.getWidth()-1)][posY].type== Map.EAU){
 				return true;
 			}
 			break;
 		case SUD:
-			if(world.getTerrain()[posX][posY + distance].type == 2){
+			if(world.getTerrain()[posX][Math.min(posY + distance, world.getHeight()-1)].type == Map.EAU){
 				return true;
 			}
 			break;
 		case OUEST:
-			if(world.getTerrain()[posX - distance][posY].type == 2){
+			if(world.getTerrain()[Math.max(posX - distance, 0)][posY].type == Map.EAU){
 				return true;
 			}
 			break;
@@ -285,22 +285,22 @@ public abstract class Agent {
 		
 		switch(d){
 		case NORD:
-			if(world.getTerrain()[posX][posY - 1].type == 4){
+			if(world.getTerrain()[posX][posY - 1].type == Map.LAVE){
 				return true;
 			}
 			break;
 		case EST:
-			if(world.getTerrain()[posX + 1][posY].type== 4){
+			if(world.getTerrain()[posX + 1][posY].type== Map.LAVE){
 				return true;
 			}
 			break;
 		case SUD:
-			if(world.getTerrain()[posX][posY + 1].type == 4){
+			if(world.getTerrain()[posX][posY + 1].type == Map.LAVE){
 				return true;
 			}
 			break;
 		case OUEST:
-			if(world.getTerrain()[posX - 1][posY].type == 4){
+			if(world.getTerrain()[posX - 1][posY].type == Map.LAVE){
 				return true;
 			}
 			break;
@@ -350,7 +350,7 @@ public abstract class Agent {
 		}
 		
 		//Si l'agent se trouve sur un arbre en feu, il prend feu
-		if(terrain.type == 4){
+		if(terrain.type == Map.LAVE){
 			this.mourir();
 			return;
 		}
@@ -362,7 +362,7 @@ public abstract class Agent {
 		}
 		
 		//Si l'agent se trouve sur de la lave, il meurt
-		else if(terrain.type == 0 && terrain.isTree && terrain.getAFA()==1){
+		else if(terrain.type == Map.PLAINE && terrain.isTree && terrain.getAFA()==1){
 			this.setOnFire();
 			return;
 		}
@@ -370,25 +370,25 @@ public abstract class Agent {
 		//On verifie si les cases autour sont de la lave, si oui, l'agent prend feu
 		if(!isOutBoundsDirection(EST)){
 			terrain = world.getTerrain()[posX+1][posY];
-			if(terrain.type == 4){
+			if(terrain.type == Map.LAVE){
 				this.setOnFire();
 			}
 		}
 		if(!isOutBoundsDirection(OUEST)){
 			terrain = world.getTerrain()[posX-1][posY];
-			if(terrain.type == 4){
+			if(terrain.type == Map.LAVE){
 				this.setOnFire();
 			}
 		}
 		if(!isOutBoundsDirection(SUD)){
 			terrain = world.getTerrain()[posX][posY+1];
-			if(terrain.type == 4){
+			if(terrain.type == Map.LAVE){
 				this.setOnFire();
 			}
 		}
 		if(!isOutBoundsDirection(NORD)){
 			terrain = world.getTerrain()[posX][posY-1];
-			if(terrain.type == 4){
+			if(terrain.type == Map.LAVE){
 				this.setOnFire();
 			}
 		}

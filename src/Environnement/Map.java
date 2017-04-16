@@ -53,12 +53,12 @@ public class Map {
 	private final static double POUR_EVAP = 0.05;
 	
 	//type de terrain
-	private final static int PLAINE = 0;
-	private final static int DESERT = 1;
-	private final static int EAU = 2;
-	private final static int TERRE = 3;
-	private final static int LAVE = 4;
-	private final static int OBSIDIENNE = 5;
+	public final static int PLAINE = 0;
+	public final static int DESERT = 1;
+	public final static int EAU = 2;
+	public final static int TERRE = 3;
+	public final static int LAVE = 4;
+	public final static int OBSIDIENNE = 5;
 	
 	//constructeur de la carte
 	public Map(int dx, int dy) {

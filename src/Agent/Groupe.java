@@ -33,9 +33,6 @@ public class Groupe<T extends Agent> {
 		
 		//Si le leader est mort, on le change
 		leader = groupe.get(0);
-		if(!leader.isAlive){
-			System.out.println("Et encore DAFUCK");
-		}
 		return leader;
 	}
 	

@@ -239,15 +239,6 @@ public class Mouton extends Prey {
 		interactEnvironment();
 		manger();
 		gestionPack();
-
-		if(belongPack){
-			this.troupeau.updateLeader();
-//			System.out.println(troupeau.leader.posX);
-//			System.out.println(troupeau.leader.posY);
-//			System.out.println(troupeau.leader.age);
-//			System.out.println(troupeau.leader.isAlive);
-//			System.out.println();
-		}
 		
 		if(age < ageAdulte){
 			comportementJeune();
@@ -304,6 +295,7 @@ public class Mouton extends Prey {
 	@Override
 	public void comportementAdulte() {
 		int champDeVisionFuite = 3;
+		int champDeVisionEau = 4;
 		
 		if(rt == 0 && belongPack){
 			reproduire();
@@ -311,7 +303,16 @@ public class Mouton extends Prey {
 		}
 		
 		if(!belongPack || this.troupeau.leader == this){
-			choixDirectionAvecFuite(champDeVisionFuite); //Fuis si besoin
+			boolean fuite = choixDirectionAvecFuite(champDeVisionFuite); //Fuis si besoin
+			
+			//Si on est pas en phase de fuite, on a une chance de s'approcher de l'eau s'il y en a a proximite
+			if(!fuite && Math.random() < 0.3){
+				int dirEau = eauAProximite(champDeVisionEau);
+				//S'il y a de l'eau a proximite
+				if(dirEau >= 0){
+					this.direction = dirEau;
+				}
+			}
 			correctDirection();		
 			move(direction, 1);
 		}
@@ -338,6 +339,7 @@ public class Mouton extends Prey {
 	public void comportementVieux() {
 		
 		int champDeVisionFuite = (int)(Math.random()*2)+1;
+		int champDeVisionEau = 3;
 		
 		if(rt == 0 && belongPack){
 			reproduire();
@@ -345,7 +347,16 @@ public class Mouton extends Prey {
 		}
 		
 		if(!belongPack || this.troupeau.leader == this){
-			choixDirectionAvecFuite(champDeVisionFuite); //Fuis si besoin
+			boolean fuite = choixDirectionAvecFuite(champDeVisionFuite); //Fuis si besoin
+			
+			//Si on est pas en phase de fuite, on a une chance de s'approcher de l'eau s'il y en a a proximite
+			if(!fuite && Math.random() < 0.5){
+				int dirEau = eauAProximite(champDeVisionEau);
+				//S'il y a de l'eau a proximite
+				if(dirEau >= 0){
+					this.direction = dirEau;
+				}
+			}
 			correctDirection();		
 			move(direction, 1);
 		}
