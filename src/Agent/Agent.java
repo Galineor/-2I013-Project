@@ -14,17 +14,22 @@ import Sprite.*;
 public abstract class Agent {
 	
 	protected boolean isPred;
+	
 	protected boolean isAlive;
 	
+	//Position actuelle
 	protected int posX;
 	protected int posY;
+	
+	//Position precedente ( pour deplacement fluide )
 	protected int prevPosX;
 	protected int prevPosY;
 	
+	//Position du sprite dans la fenetre
 	protected int spritePosX;
 	protected int spritePosY;
 	
-	protected boolean belongPack;
+	protected boolean belongPack; //Appartenance a un groupe d'agent
 
 	protected int direction;
 	public static final int NORD = 0;
@@ -38,8 +43,9 @@ public abstract class Agent {
 	protected int age;
 	protected Agent parent;
 	
-	protected int reprodTime;
-	protected int hungerTime;
+	protected int reprodTime; //Temps entre 2 reproduction
+	protected int hungerTime; //Temps maximum sans manger
+	
 	protected int ht, rt; //Compteur de faim et de reproduction
 	
 	protected int ageAdulte;
@@ -50,6 +56,7 @@ public abstract class Agent {
 	
 	protected boolean isOnFire;
 	protected int cptOnFire; // Les agents meurent apres quelques iterations
+	
 	protected Image fireSprite;
 	
 	protected Image sleepSprite;
@@ -77,6 +84,7 @@ public abstract class Agent {
 	
 	public abstract void Step();
 	
+	//Met a jour les positions pour les sprites ( pour mouvement fluide )
 	public void updatePrevPos(){
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
@@ -84,6 +92,7 @@ public abstract class Agent {
 		spritePosY = this.prevPosY*SpriteDemo.spriteLength;
 	}
 	
+	//Permet d'avancer les sprites ( pour mouvement fluide )
 	public void StepSprite(){
 		if(prevPosX != -1 && prevPosY != -1){
 			if(prevPosX != this.posX || prevPosY != this.posY){
@@ -106,6 +115,7 @@ public abstract class Agent {
 		}
 	}
 	
+	
 	public double distanceFrom(Agent a){
 		return Math.sqrt(Math.pow(this.posX - a.posX, 2) + Math.pow(this.posY - a.posY, 2));
 	}
@@ -125,6 +135,7 @@ public abstract class Agent {
 				direction = (direction-1+4) %4;
 		}
 	}
+	
 	
 	public void move(int direction, int distance){
 		if(direction == NO_MOVE){
@@ -191,6 +202,7 @@ public abstract class Agent {
 		move(direction, 1);
 	}
 	
+	//Permet de verifier que l'argent a le droit de se deplacer dans la direction actuelle 
 	public void correctDirection(){
 		//Si l'agent ne peut pas se deplacer dans la direction actuelle, on essaie les autres directions
 		if(isOutBoundsDirection(direction) || isWaterDirection(direction) || isLavaDirection(direction)){

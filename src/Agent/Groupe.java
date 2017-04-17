@@ -31,7 +31,7 @@ public class Groupe<T extends Agent> {
 			return null;
 		}
 		
-		//Si le leader est mort, on le change
+		//Si le leader est mort, on le change par un autre membre de la meute
 		leader = groupe.get(0);
 		return leader;
 	}

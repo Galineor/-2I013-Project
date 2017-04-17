@@ -259,19 +259,25 @@ public class Mouton extends Prey {
 		int champDeVisionFuite = 3;
 		if(parent != null && parent.isAlive() && !parent.belongPack){
 			if(!choixDirectionAvecFuite(champDeVisionFuite)){
-				//Si le mouton n'est pas en danger, il se deplace vers son parent
+				//Si le mouton n'est pas en danger, il se deplace vers son parent si possible
 				if(distanceFrom(parent) > 2){
 					moveToward(parent);
-				}else{
+				}
+				//Si le parent est trop loin, il se deplace aleatoirement
+				else{
 					deplacementAleatoire();
 					correctDirection();
 					move(direction, 1);
 				}
 			}else{
+				//S'il y a un danger, on fuit
 				correctDirection();
 				move(direction, 1);
 			}
-		}else if(belongPack && this.troupeau.leader != this){
+		}
+		//Si le mouton appartient a un troupeau, il suite le troupeau
+		//S'il y a un danger, il fuit dans une direction possible
+		else if(belongPack && this.troupeau.leader != this){
 			if(choixDirectionAvecFuite(champDeVisionFuite)){
 				correctDirection();
 				move(direction, 1);

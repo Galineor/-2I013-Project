@@ -20,31 +20,31 @@ public class SpriteDemo extends JPanel {
 
 	private JFrame frame;
 	
-	public static int spriteLength = 16;
-	private static int delai = 100;
+	public static int spriteLength = 16; 
+	private static int delai = 12; //Vitesse d'éxécution
 	
-	private int NbDepartLoup = 35;
+	private int NbDepartLoup = 35; 
 	private int NbDepartMouton = 80;
 	private int NbDepartAlligator = 20;
 	
 	private int tailleX =40, tailleY = 40;
-	private Map myMap;
-
+	
+	private Map myMap; //Environment
 	
 	private ArrayList<Agent> cloneAgent;
 	
 	public SpriteDemo(){
 		
 		myMap = new Map(tailleX, tailleY);
-//		for(int i=0; i< NbDepartLoup; i++){
-//			myMap.getAgents().add(new Loup(myMap));
-//		}
-//		for(int i=0; i< NbDepartMouton; i++){
-//			myMap.getAgents().add(new Mouton(myMap));
-//		}
-//		for(int i=0; i< NbDepartAlligator; i++){
-//			myMap.getAgents().add(new Alligator(myMap));
-//		}
+		for(int i=0; i< NbDepartLoup; i++){
+			myMap.getAgents().add(new Loup(myMap));
+		}
+		for(int i=0; i< NbDepartMouton; i++){
+			myMap.getAgents().add(new Mouton(myMap));
+		}
+		for(int i=0; i< NbDepartAlligator; i++){
+			myMap.getAgents().add(new Alligator(myMap));
+		}
 			
 		frame = new JFrame("World of Sprite");
 		frame.add(this);
@@ -70,7 +70,7 @@ public class SpriteDemo extends JPanel {
 		}
 	}
 	
-	//reaffiche le terrain apres avoir fait une step
+	//reaffiche le terrain apres avoir fait une step, permet l'animation en plusieurs étapes pour chaque Step
 	public void Step(){
 		myMap.Step();
 		for(int i=0; i<=spriteLength; i++){
@@ -88,6 +88,8 @@ public class SpriteDemo extends JPanel {
 
 	public static void main(String[] args) {
 		SpriteDemo monSpriteDemo = new SpriteDemo();
+		
+		//Le programme tourne en continu jusqu'a l'arret par l'utilisateur
 		while (true){
 			monSpriteDemo.Step();
 		}

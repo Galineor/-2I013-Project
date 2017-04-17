@@ -158,7 +158,7 @@ public class Map {
 		majForet(terrain);
 		majEau();
 		majHerbe();
-		if (Math.random() < 0.05 && terrain[dx / 2][dy / 2].type != LAVE)
+		if (Math.random() < 0.005 && terrain[dx / 2][dy / 2].type != LAVE)
 			Volcan(terrain);
 		majLAVA();
 	}

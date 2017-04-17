@@ -138,31 +138,7 @@ public class Loup extends Pred {
 
 		}
 	}
-
-
-	@Override
-	public void Step() {
-		updatePrevPos();
-		interactEnvironment();
-		gestionPack();
-		
 	
-		//Si le loup a trop faim, il meurt
-		if(ht <= 0 || age == ageMort){
-			this.mourir();
-			return;
-		}
-		if(age<ageAdulte){
-			comportementJeune();
-		}else if(age<ageVieux){
-			comportementAdulte();
-		}else{
-			comportementVieux();
-		}
-		age++;
-	}
-
-
 	public void gestionPack(){
 		for(Agent a : world.getAgents()){
 			if(a instanceof Loup && a.isAlive && !a.equals(this)){
@@ -170,11 +146,14 @@ public class Loup extends Pred {
 				if(a.getPosX() >= this.posX - 3 && a.getPosX() <= this.posX + 3 &&
 						a.getPosY() >= this.posY - 3 && a.getPosY() <= this.posY + 3){
 					if(!this.belongPack){
+						//S'il l'autre Loup appartient a une meute et qu'elle n'est pas trop grande, on la rejoint
 						if(a.belongPack && ((Loup)a).pack.groupe.size() < 5){
 							((Loup)a).pack.add(this);
 							this.pack = ((Loup)a).pack;
 							this.belongPack = true;
-						}else if(!a.belongPack){
+						}
+						//Sinon si l'autre loup n'appartient pas a une meute, on en cree une nouvelle
+						else if(!a.belongPack){
 							this.pack = new Groupe<Loup>(this);
 							this.pack.add((Loup)a);
 							this.belongPack = true;
@@ -195,7 +174,8 @@ public class Loup extends Pred {
 			}
 		}
 	}
-	
+
+
 	public void quitterGroupe(){
 		if(!belongPack){
 			return;
@@ -207,6 +187,8 @@ public class Loup extends Pred {
 		this.pack = null;
 	}
 	
+	
+	//Permet de decider quelle comportement le loup doit utiliser
 	public void arbreDeComportement(int tempsDeplacement, int tempsRepos, int tempsChasse){
 		//Si l'arbre de comportement n'est initialise a aucune valeur, on lui indique de commencer la phase de deplacement
 		if(cptDeplacement == 0 && cptRepos == 0 && cptChasse == 0){
@@ -253,6 +235,28 @@ public class Loup extends Pred {
 			cptDeplacement = tempsDeplacement;
 		}
 	}
+	
+	@Override
+	public void Step() {
+		updatePrevPos();
+		interactEnvironment();
+		gestionPack();
+		
+	
+		//Si le loup a trop faim, il meurt
+		if(ht <= 0 || age == ageMort){
+			this.mourir();
+			return;
+		}
+		if(age<ageAdulte){
+			comportementJeune();
+		}else if(age<ageVieux){
+			comportementAdulte();
+		}else{
+			comportementVieux();
+		}
+		age++;
+	}
 
 
 	@Override
@@ -297,6 +301,8 @@ public class Loup extends Pred {
 		
 			arbreDeComportement(tempsDeplacement, tempsRepos, tempsChasse);
 			
+			
+			//On regarde dans quelle phase on est et on agit en fonction
 			if(cptDeplacement > 0){
 				//On essaie de chasser
 				chasser(champDeVisionChasse);
@@ -330,9 +336,9 @@ public class Loup extends Pred {
 			}
 		}
 
-		ht--;
+		ht--; //Compteur de faim
 		if(belongPack){
-			rt--;
+			rt--; //Compteur de reproduction
 		}
 	}
 

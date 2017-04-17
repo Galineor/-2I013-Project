@@ -12,7 +12,7 @@ import Environnement.Map;
 public class Alligator extends Pred {
 	
 	private Image alligatorSprite;
-	private boolean returningToWater;
+	private boolean returningToWater; 
 	private int posAvantChasseX;
 	private int posAvantChasseY;
 	
@@ -55,6 +55,7 @@ public class Alligator extends Pred {
 		
 	}
 	
+	//Permet de definir des positions de l'alligator dans l'eau
 	public void placementDansEau(){
 		int x = (int)(Math.random()*world.getWidth());
 		int y = (int)(Math.random()*world.getHeight());
@@ -68,6 +69,7 @@ public class Alligator extends Pred {
 		this.setPosY(y);
 	}
 	
+	//Permet d'afficher les sprites
 	public void afficher(Graphics2D g2, JFrame frame, int spriteLength){
 		if(getSpritePosX() == -1 || getSpritePosY() == -1){
 			this.spritePosX = this.posX * spriteLength;
@@ -104,6 +106,92 @@ public class Alligator extends Pred {
 		age++;
 		rt--;
 		ht--;
+	}
+	
+	@Override
+	public void comportementJeune() {
+		//Quand ils sont jeunes, ils se deplacent partout et ne chasse pas
+		deplacementAleatoire();
+		correctDirection();
+		move(direction, 1);
+		
+		//Permet de varier le temps pendant lequel chaque alligator restera jeune
+		age+= (int)(Math.random()*3);
+	}
+
+	@Override
+	public void comportementAdulte() {
+		int champDeVisionChasse = 3;
+		int tempsDeplacement = 5;
+		int tempsAttente = 20; //Temps d'attente avant de changer de position de chasse
+		
+		// Quand ils sont adultes, ils cherhent une rive sur laquelle attendre pour chasser
+		
+		
+		//Si l'agent est entrain de retourner a sa position de chasse
+		if(this.returningToWater){
+			//Si on est de retour a la position d'avant chasse, on peut reprendre le cycle normal
+			if(this.posAvantChasseX == this.posX && this.posAvantChasseY == this.posY){
+				returningToWater = false;
+			}
+			//Sinon on continue de se deplacer vers cette position
+			else{
+				moveToward(posAvantChasseX, posAvantChasseY, false);
+			}
+		}
+		
+		//Si l'alligator a depasser le temps d'attente maximum, il change de position
+		if(tempsAttenteProie > tempsAttente){
+			cptDeplacement = tempsDeplacement;
+			tempsAttenteProie = 0;
+		}	
+		
+		//Quand on est pret a chasser, on essaie de chasser
+		if(!returningToWater){
+			tempsAttenteProie++;
+			chasse(champDeVisionChasse);
+		}
+		
+		//Si on est a cote d'une rive, on ne bouge pas
+		if((!returningToWater && !RiveProche()) || cptDeplacement > 0){
+			deplacementAleatoire();
+			correctDirection();
+			move(direction, 1);
+		}
+		
+		//Permet de gerer le temps pendant lequel l'alligator se deplace
+		if(cptDeplacement > 0){
+			cptDeplacement--;
+		}
+		
+	}
+
+	@Override
+	public void comportementVieux() {
+		int champDeVisionChasse = 2;
+		
+		if(this.returningToWater){
+			//Si on est de retour a la position d'avant chasse, on peut reprendre le cycle normal
+			if(this.posAvantChasseX == this.posX && this.posAvantChasseY == this.posY){
+				returningToWater = false;
+			}
+			//Sinon on continue de se deplacer vers cette position
+			else{
+				moveToward(posAvantChasseX, posAvantChasseY, false);
+			}
+		}
+		
+		
+		if(!returningToWater){
+			chasse(champDeVisionChasse);
+		}
+		
+		//Si on est a cote d'une rive, on ne bouge pas
+		if(!returningToWater && !RiveProche()){
+			correctDirection();
+			move(direction, 1);
+		}
+		
 	}
 	
 	public void reproduire(){
@@ -145,7 +233,7 @@ public class Alligator extends Pred {
 		}
 	}
 	
-	//Changement de la methode de verification de direction pour rester dans l'eau
+	//Changement de la methode de verification de direction afin de rester dans l'eau
 	@Override
 	public void correctDirection(){
 		if(isChasing){
@@ -175,6 +263,7 @@ public class Alligator extends Pred {
 		//Ne pas sortir de l'eau
 	}
 	
+	//Detecte si une rive est dans le voisinage de Von Neumann de l'agent
 	public boolean RiveProche(){
 		for(int i=0; i<4; i++){
 			if(!isOutBoundsDirection(i) && !isWaterDirection(i)){
@@ -182,83 +271,6 @@ public class Alligator extends Pred {
 			}
 		}	
 		return false;
-	}
-
-	@Override
-	public void comportementJeune() {
-		//Quand ils sont jeunes, ils se deplacent partout et ne chasse pas
-		deplacementAleatoire();
-		correctDirection();
-		move(direction, 1);
-	}
-
-	@Override
-	public void comportementAdulte() {
-		int champDeVisionChasse = 3;
-		int tempsDeplacement = 5;
-		int tempsAttente = 20;
-		// Quand ils sont adultes, ils cherhent une rive sur laquelle attendre pour chasser
-		
-		if(this.returningToWater){
-			//Si on est de retour a la position d'avant chasse, on peut reprendre le cycle normal
-			if(this.posAvantChasseX == this.posX && this.posAvantChasseY == this.posY){
-				returningToWater = false;
-			}
-			//Sinon on continue de se deplacer vers cette position
-			else{
-				moveToward(posAvantChasseX, posAvantChasseY, false);
-			}
-		}
-		
-		if(tempsAttenteProie > tempsAttente){
-			cptDeplacement = tempsDeplacement;
-			tempsAttenteProie = 0;
-		}	
-		
-		if(!returningToWater){
-			tempsAttenteProie++;
-			chasse(champDeVisionChasse);
-		}
-		
-		//Si on est a cote d'une rive, on ne bouge pas
-		if((!returningToWater && !RiveProche()) || cptDeplacement > 0){
-			deplacementAleatoire();
-			correctDirection();
-			move(direction, 1);
-		}
-		
-		if(cptDeplacement > 0){
-			cptDeplacement--;
-		}
-		
-	}
-
-	@Override
-	public void comportementVieux() {
-		int champDeVisionChasse = 2;
-		
-		if(this.returningToWater){
-			//Si on est de retour a la position d'avant chasse, on peut reprendre le cycle normal
-			if(this.posAvantChasseX == this.posX && this.posAvantChasseY == this.posY){
-				returningToWater = false;
-			}
-			//Sinon on continue de se deplacer vers cette position
-			else{
-				moveToward(posAvantChasseX, posAvantChasseY, false);
-			}
-		}
-		
-		
-		if(!returningToWater){
-			chasse(champDeVisionChasse);
-		}
-		
-		//Si on est a cote d'une rive, on ne bouge pas
-		if(!returningToWater && !RiveProche()){
-			correctDirection();
-			move(direction, 1);
-		}
-		
 	}
 
 }
