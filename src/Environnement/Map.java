@@ -21,7 +21,7 @@ import Agent.Agent;
 
 public class Map {
 	
-	//sprite utlilisé pour la carte
+	//sprite utlilise pour la carte
 	private Image waterSprite;
 	private Image grassSprite;
 	private Image desertSprite;
@@ -136,7 +136,7 @@ public class Map {
 		StepAgent();
 	}
 
-	// lance les modifications apportée aux agents
+	// lance les modifications apportee aux agents
 	public void StepAgent() {
 		for (Agent a : getAgents()) {
 			if (a.isAlive() && Math.random() < 0.80)
@@ -151,7 +151,7 @@ public class Map {
 		toAdd.clear();
 	}
 
-	// effectue les modification apporté a l'environnement
+	// effectue les modification apporte a l'environnement
 	public void StepWorld() {
 		meteo();
 		majForet(terrain);
@@ -164,7 +164,7 @@ public class Map {
 
 	// met a jour l'herbe de la carte
 	public void majHerbe() {
-		int x, y; // coordonnées aleatoires
+		int x, y; // coordonnees aleatoires
 		int p; // variabble de pousse de la case actuelle
 
 		for (int i = 0; i < terrain.length / 3; i++) {
@@ -216,7 +216,7 @@ public class Map {
 
 				} else {
 					if (t[x][y].getAFA() == 1) {
-						// les arbres en feu disparraissent si près de lave
+						// les arbres en feu disparraissent si pres de lave
 						if (t[(x - 1 + dx) % dx][y].type == LAVE || t[(x + 1 + dx) % dx][y].type == LAVE
 								|| t[x][(y - 1 + dy) % dy].type == LAVE || t[x][(y + 1 + dy) % dy].type == LAVE) {
 							t[x][y].setAFA(0);

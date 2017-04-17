@@ -87,7 +87,7 @@ public class Mouton extends Prey {
 			//Alors il mange s'il y a de l'herbe sous ses pieds
 			pousse = world.getTerrain()[posX][posY].getPousse();
 			if(pousse>=5){
-				world.getTerrain()[posX][posY].setPousse(pousse-5);
+				world.getTerrain()[posX][posY].setPousse(0);
 				this.setHt(hungerTime/2);
 			}
 		}
