@@ -43,14 +43,15 @@ public class Map {
 	private int[] casesFoudre; //emplacement du dernier coup de foudre
 	
 	//modification des parametres de la carte
-	private final static double OCEAN = 0.3; 		// 0=>carte remplie d'eau 	1=>carte sans eau			par default: 0.3
-	private final static double FORET = 0.2;		// 0=>aucun arbre 			1=>que des arbres			par default: 0.2
-	private final static double LAC = 0.01;  		// 0=>pas d'eau				1=>carte remplie d'eau		par default: 0.01
-	private final static double PLUIE = 0.001; 		// 0=>pas de pluie			1=>100% pluie				par default: 0.001
-	private final static double TEMPS_PLUIE = 0.05; // 0=>pluie sans fin		1=>pluie d'une iteration	par default: 0.05
-	private final static double NOUV_LAC = 0.01;
-	private final static double ADD_WATER = 0.1;
-	private final static double POUR_EVAP = 0.05;
+	private final static double OCEAN = 0.3; 		// 0=>carte remplie d'eau 			1=>carte sans eau							par default: 0.3
+	private final static double FORET = 0.2;		// 0=>aucun arbre 					1=>que des arbres							par default: 0.2
+	private final static double LAC = 0.01;  		// 0=>pas d'eau						1=>carte remplie d'eau						par default: 0.01
+	private final static double PLUIE = 0.001; 		// 0=>pas de pluie					1=>100% pluie								par default: 0.001
+	private final static double TEMPS_PLUIE = 0.05; // 0=>pluie sans fin				1=>pluie d'une iteration					par default: 0.05
+	private final static double NOUV_LAC = 0.01;	// 0=>aucun nouveau lac				1=>cree nouveau lac a chaque fois			par default: 0.01
+	private final static double ADD_WATER = 0.1;	// 0=>n'ajoute jamais d'eau			1=>100% ajout d'eau							par default: 0.1
+	private final static double POUR_EVAP = 0.05;	// 0=>aucune evaporation			1=>le compteur est reduit a chaque fois		par default: 0.05
+	private final static double ECLAIR = 0.1;		// 0=>aucun eclair					1=>un eclair a chaque fois					par default: 0.1
 	
 	//type de terrain
 	public final static int PLAINE = 0;
@@ -157,7 +158,7 @@ public class Map {
 		majForet(terrain);
 		majEau();
 		majHerbe();
-		if (Math.random() < 0.001 && terrain[dx / 2][dy / 2].type != LAVE)
+		if (Math.random() < 0.05 && terrain[dx / 2][dy / 2].type != LAVE)
 			Volcan(terrain);
 		majLAVA();
 	}
@@ -240,7 +241,7 @@ public class Map {
 					}
 					
 					//feu aleatoire
-//					if (Math.random() < 0.0001) {
+//					if (Math.random() < 0.01) {
 //						t[x][y].setAFA(1);
 //					}
 				}
@@ -411,7 +412,7 @@ public class Map {
 			terrain[x][y].setFoudre(false);
 		
 		// foudre
-		if (Math.random() < 0.1) {
+		if (Math.random() < ECLAIR) {
 			x = (int) (Math.random() * dx);
 			y = (int) (Math.random() * dy);
 			//mets la foudre sur la case
